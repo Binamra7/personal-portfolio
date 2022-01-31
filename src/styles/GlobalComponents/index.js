@@ -9,7 +9,13 @@ export const Section = styled.section`
   box-sizing: content-box;
   position: relative;
   overflow: hidden;
+
+  
+
   grid-template-columns: 1fr 1fr;
+
+ 
+  
 
  
 
@@ -39,6 +45,7 @@ export const SectionTitle = styled.h2`
   -webkit-text-fill-color: transparent;
   margin-bottom: 16px;
   padding: ${(props) => props.main ? '58px 0 16px' : '0'};
+
 
   @media ${props => props.theme.breakpoints.md}{
     font-size: ${(props) => props.main ? '56px' : '48px'};
@@ -82,13 +89,17 @@ export const SectionText = styled.p`
 
 export const SectionDivider = styled.div`
 
+
+
   width: 64px;
   height: 6px;
   border-radius: 10px;
   background-color: #fff;
   background: ${(props) => props.colorAlt ? 
-    'linear-gradient(270deg, #F46737 0%, #945DD6 100%)' :
-    'linear-gradient(270deg, #13ADC7 0%, #945DD6 100%)'};
+    'linear-gradient(270deg, #13ADC7 0%, #945DD6 100%)'
+    :
+    'linear-gradient(270deg, #c31432 0%, #240b36 100%)' 
+  };
 
     margin: ${(props) => props.divider ? "4rem 0" : "" };
 

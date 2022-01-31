@@ -9,7 +9,7 @@ const Copy = () => {
             marginTop: '-30px',
             marginBottom: '15px'
         }}>
-            &copy; Designed with ❤️ by Binamra Khadka
+            &copy; Designed by Binamra Khadka
         </div>
     )
 };

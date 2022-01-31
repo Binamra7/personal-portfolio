@@ -7,8 +7,8 @@ import { AiFillGithub, AiFillTwitterCircle,AiFillTwitterSquare, AiFillLinkedin,A
 
 
 const Projects = () => (
-  <Section nopadding id="projects">
-    <SectionDivider />
+  <Section nopadding id="projects" >
+    <SectionDivider divider/>
     <SectionTitle main>Projects</SectionTitle>
     <GridContainer>
       {projects.map(({id, image, title, description, tags, source, visit}) => (
@@ -28,7 +28,7 @@ const Projects = () => (
             </TagList>
           </div>
           <UtilityList>
-            <ExternalLinks href={visit} target="_blank">
+            <ExternalLinks href={source} target="_blank">
               <div style={{display:'inline'}}>
                 
               <AiFillGithub/>
@@ -36,7 +36,7 @@ const Projects = () => (
               </div>
               &nbsp;Code
             </ExternalLinks>
-            <ExternalLinks href={source} target="_blank">Demo</ExternalLinks>
+            <ExternalLinks href={visit} target="_blank">Demo</ExternalLinks>
 
           </UtilityList>
         </BlogCard>

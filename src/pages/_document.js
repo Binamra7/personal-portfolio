@@ -1,4 +1,4 @@
-import Document, { Head, Html, Main, NextScript } from 'next/document'
+import Document, { Head, Html, Main, NextScript} from 'next/document'
 import { ServerStyleSheet } from 'styled-components'
 
 
@@ -31,16 +31,22 @@ export default class MyDocument extends Document {
   render() {
     return (
       <Html lang='en-GB'>
+        <title>Binamra Khadka</title>
         <Head>
          
           <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+          
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat&family=Poppins:wght@200;400&display=swap" rel="stylesheet"/>
           
 
           <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Nunito&display=swap" rel="stylesheet"/>
 
-          {/* <link rel="stylesheet" href="./layout.css"/> */}
+
+  
 
 
           
