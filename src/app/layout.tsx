@@ -1,0 +1,72 @@
+import type { Metadata, Viewport } from "next";
+import { Bricolage_Grotesque, Martian_Mono } from "next/font/google";
+import { SmoothScroll } from "@/components/SmoothScroll";
+import { heroIntro, profile } from "@/content/site";
+import { getSiteUrl } from "@/lib/site-url";
+import "./globals.css";
+
+// Self-hosted at build time. Bricolage needs its width axis (animated) and its
+// optical-size axis: without it, large headlines render with the wider text cut.
+const display = Bricolage_Grotesque({
+  subsets: ["latin"],
+  axes: ["wdth", "opsz"],
+  variable: "--font-bricolage",
+  display: "swap",
+});
+
+// Labels only use one weight, so a static file is enough.
+const mono = Martian_Mono({
+  subsets: ["latin"],
+  weight: "400",
+  variable: "--font-martian",
+  display: "swap",
+});
+
+const title = `${profile.name} — ${profile.role}`;
+
+export const metadata: Metadata = {
+  metadataBase: new URL(getSiteUrl()),
+  title,
+  description: heroIntro,
+  authors: [{ name: profile.name }],
+  openGraph: {
+    type: "website",
+    title,
+    description: heroIntro,
+    siteName: profile.name,
+    locale: "en_GB",
+  },
+  twitter: { card: "summary_large_image", title, description: heroIntro },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#0b0b0a",
+  colorScheme: "dark",
+};
+
+// Set before first paint so reveal styles only hide content when JS can show it
+// again. If the app bundle never runs (blocked, failed), drop the flag after 4s
+// so content isn't stuck invisible. Reveal sets data-hydrated when it mounts.
+const jsFlag =
+  "var d=document.documentElement;d.classList.add('js');setTimeout(function(){if(!('hydrated' in d.dataset))d.classList.remove('js')},4000)";
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en-GB" className={`${display.variable} ${mono.variable}`} suppressHydrationWarning>
+      <head>
+        {/* biome-ignore lint/security/noDangerouslySetInnerHtml: static, trusted one-liner */}
+        <script dangerouslySetInnerHTML={{ __html: jsFlag }} />
+      </head>
+      <body>
+        <a
+          href="#work"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[60] focus:rounded-full focus:bg-fg focus:px-4 focus:py-2 focus:text-bg"
+        >
+          Skip to content
+        </a>
+        <SmoothScroll />
+        {children}
+      </body>
+    </html>
+  );
+}

@@ -1,0 +1,268 @@
+@import "tailwindcss";
+
+/* Hover effects are progressive: on touch screens their result is shown by default. */
+@custom-variant hover-device (@media (hover: hover));
+@custom-variant touch-device (@media (hover: none));
+
+/*
+ * Design tokens. See docs/DESIGN.md before changing these.
+ * Warm near-black, sand highlights, one saffron accent. No purple.
+ */
+@theme {
+  --color-bg: #0b0b0a;
+  --color-surface: #131311;
+  --color-raised: #1b1b18;
+  --color-line: rgb(236 235 228 / 0.1);
+  --color-line-strong: rgb(236 235 228 / 0.2);
+  --color-fg: #ecebe4;
+  --color-muted: #adaba2;
+  --color-faint: #8a8880;
+  --color-accent: #f4a73b;
+  /* Highlight colour of the duotone screenshot treatment. */
+  --color-sand: #d4c3a1;
+
+  --font-display: var(--font-bricolage), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-bricolage), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-martian), ui-monospace, monospace;
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Hero lines: rise out of a mask while the font settles from wide/light to
+     condensed/bold. Uses Bricolage's variable width + weight axes. */
+  --animate-settle: settle 1.4s var(--ease-out-expo) both;
+  --animate-fade-up: fade-up 1s var(--ease-out-expo) both;
+  --animate-eq: eq 1.1s ease-in-out infinite;
+
+  @keyframes eq {
+    0%,
+    100% {
+      transform: scaleY(0.3);
+    }
+    50% {
+      transform: scaleY(1);
+    }
+  }
+
+  @keyframes settle {
+    from {
+      transform: translateY(100%);
+      font-variation-settings: "wdth" 100;
+      font-weight: 300;
+      filter: blur(8px);
+    }
+    to {
+      transform: none;
+      font-variation-settings: "wdth" 75;
+      font-weight: 700;
+      filter: blur(0);
+    }
+  }
+
+  @keyframes fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(1rem);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+}
+
+@utility condensed {
+  font-family: var(--font-display);
+  font-variation-settings: "wdth" 75;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+/* Lens radius animates smoothly because it is a registered property. */
+@property --lens-r {
+  /* length-percentage: touch screens use 150% (full colour), hover uses px. */
+  syntax: "<length-percentage>";
+  inherits: true;
+  initial-value: 0px;
+}
+
+@layer base {
+  html {
+    color-scheme: dark;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Decorations (glows, the archive preview) may extend past the edge; never
+     scroll sideways. Set on both: body's overflow is otherwise moved to the
+     viewport, where it no longer clips the body's content. */
+  html,
+  body {
+    overflow-x: clip;
+  }
+
+  body {
+    @apply bg-bg font-sans text-fg antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Tailwind v4's reset gives buttons `cursor: default`; anything clickable
+     should show the pointer. */
+  a[href],
+  button:not(:disabled),
+  [role="button"],
+  summary,
+  label[for],
+  select {
+    cursor: pointer;
+  }
+  :disabled {
+    cursor: not-allowed;
+  }
+
+  ::selection {
+    @apply bg-accent text-bg;
+  }
+
+  :focus-visible {
+    @apply rounded-sm outline-2 outline-accent outline-offset-4;
+  }
+
+  /* Film grain over everything: kills banding and hides low-res screenshots. */
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    pointer-events: none;
+    opacity: 0.06;
+    /* Own compositor layer: scrolling never repaints the grain. */
+    transform: translateZ(0);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+}
+
+/* Lenis smooth scrolling (recommended base styles). */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis:not(.lenis-autoToggle).lenis-stopped {
+  overflow: clip;
+}
+
+/* Scroll reveal. Only hides content when JS is running (`.js` is set by an
+   inline script in the layout), so no-JS visitors still see everything. */
+.js [data-reveal] {
+  opacity: 0;
+  transform: translateY(1.5rem);
+  transition:
+    opacity 0.9s var(--ease-out-expo),
+    transform 0.9s var(--ease-out-expo);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+
+.js [data-reveal][data-visible="true"] {
+  opacity: 1;
+  transform: none;
+}
+
+/* Hairlines that draw themselves in when their row is revealed. */
+.js [data-reveal] .draw-line {
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 1.2s var(--ease-out-expo);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+.js [data-reveal][data-visible="true"] .draw-line {
+  transform: scaleX(1);
+}
+
+/*
+ * Duotone: maps any screenshot to page-black → sand, so old, bright,
+ * mismatched screenshots all look like one consistent print.
+ * The sand background is multiplied with a greyscale image (whites become
+ * sand), then a `lighten` layer lifts pure black to the page colour.
+ */
+.duotone {
+  /* Position comes from utilities (e.g. `absolute inset-0`). */
+  isolation: isolate;
+  background: var(--color-sand);
+}
+.duotone > img {
+  filter: grayscale(1) contrast(1.2) brightness(0.92);
+  mix-blend-mode: multiply;
+}
+.duotone::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--color-bg);
+  mix-blend-mode: lighten;
+  pointer-events: none;
+}
+
+/*
+ * Scroll-linked effects. useScrollProgress writes --p (and --q) from 0 to 1.
+ * Each fallback is the finished state, which is what visitors without JS or
+ * with reduced motion see.
+ */
+.hero-line {
+  opacity: calc(1 - var(--p, 0) * 0.88);
+  transform: translateX(calc(var(--p, 0) * var(--drift)));
+}
+.drift-row {
+  transform: translateX(calc((var(--p, 0.5) - 0.5) * 2 * var(--drift)));
+}
+.scale-in {
+  transform-origin: bottom left;
+  transform: translateY(calc((1 - var(--p, 1)) * 25%)) scale(calc(0.82 + var(--p, 1) * 0.18));
+}
+.progress-fill {
+  transform-origin: top;
+  transform: scaleY(var(--p, 1));
+  transition: transform 0.3s ease-out;
+}
+.progress-head {
+  transform: translateY(calc(var(--p, 1) * 100%));
+  transition: transform 0.3s ease-out;
+}
+.page-progress {
+  transform-origin: left;
+  transform: scaleX(var(--p, 0));
+}
+.lens-frame {
+  clip-path: inset(
+    calc((1 - var(--p, 1)) * 14%) calc((1 - var(--p, 1)) * 10%) round
+      calc(12px + (1 - var(--p, 1)) * 16px)
+  );
+}
+.lens-parallax {
+  transform: translateY(calc((var(--q, 0.5) - 0.5) * 12%));
+}
+@media (prefers-reduced-motion: no-preference) {
+  .scroll-fill {
+    color: transparent;
+    background:
+      linear-gradient(90deg, var(--color-fg) 50%, rgb(236 235 228 / 0.16) 50%) 0 0 / 200% 100%;
+    background-position-x: calc((1 - var(--p, 1)) * 100%);
+    background-clip: text;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
+  }
+
+  .js [data-reveal],
+  .js [data-reveal] .draw-line {
+    opacity: 1;
+    transform: none;
+  }
+}
