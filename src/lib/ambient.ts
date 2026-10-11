@@ -27,6 +27,8 @@ export class AmbientEngine {
   private reverb: ConvolverNode | null = null;
   private chimeTimer: ReturnType<typeof setTimeout> | undefined;
   private suspendTimer: ReturnType<typeof setTimeout> | undefined;
+  /** Bumped by start/stop so a start that was waiting on resume() can tell it's stale. */
+  private run = 0;
   playing = false;
 
   constructor(private readonly ctx: AudioContext) {}
@@ -34,10 +36,13 @@ export class AmbientEngine {
   async start() {
     if (this.playing) return;
     this.playing = true;
+    const run = ++this.run;
     clearTimeout(this.suspendTimer);
     const master = this.master ?? this.build();
 
+    // Stays pending until the browser allows audio (first user activation).
     await this.ctx.resume();
+    if (run !== this.run) return;
     this.rampTo(master, MASTER_VOLUME, 4);
     this.scheduleChime(1500);
   }
@@ -45,6 +50,7 @@ export class AmbientEngine {
   stop() {
     if (!this.playing || !this.master) return;
     this.playing = false;
+    this.run++;
     clearTimeout(this.chimeTimer);
     this.rampTo(this.master, 0, 1.5);
     // Let the fade finish, then let the audio thread idle.

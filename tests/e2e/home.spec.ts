@@ -87,13 +87,12 @@ test.describe("navigation", () => {
     await page.goto("/");
     const toggles = page.locator("[data-sound-toggle]");
     await expect(toggles).toHaveCount(2);
-    // Browsers block audio until a gesture, so the UI must not claim it's playing yet.
+    await expect(toggles.first()).toContainText("Sound on");
+    // Waiting for the browser to allow audio (no gesture yet).
     await expect(toggles.first()).toHaveAttribute("data-state", "armed");
-    await expect(toggles.first()).toContainText("Tap for sound");
 
     await page.locator("h1").click();
     await expect(toggles.first()).toHaveAttribute("data-state", "playing");
-    await expect(toggles.first()).toContainText("Sound on");
 
     await page
       .getByRole("button", { name: /mute ambient sound/i })
@@ -106,11 +105,15 @@ test.describe("navigation", () => {
     await expect(page.locator("[data-sound-toggle]").first()).toHaveAttribute("data-state", "off");
   });
 
-  test("clicking the toggle before any other interaction starts the sound", async ({ page }) => {
+  test("a tap on a touch screen starts the sound", async ({ page, isMobile }) => {
+    test.skip(!isMobile, "touch only");
+    // Regression: a touch's pointerdown doesn't unlock audio; we used to give up after it.
     await page.goto("/");
-    const toggle = page.locator("[data-sound-toggle]").first();
-    await toggle.click();
-    await expect(toggle).toHaveAttribute("data-state", "playing");
+    await page.locator("h1").tap();
+    await expect(page.locator("[data-sound-toggle]").first()).toHaveAttribute(
+      "data-state",
+      "playing",
+    );
   });
 
   test("the soundtrack is audible on small speakers, but quiet", async ({ page, isMobile }) => {
@@ -174,5 +177,34 @@ test.describe("layout stability", () => {
       await page.waitForTimeout(200);
     }
     expect(heights.size).toBe(1);
+  });
+});
+
+test.describe("touch screens", () => {
+  test("show screenshots in full colour and archive thumbnails by default", async ({
+    page,
+    isMobile,
+  }) => {
+    test.skip(!isMobile, "touch only");
+    await page.goto("/");
+    await expect(page.getByText(/tap for colour/i)).toHaveCount(0);
+    await expect(page.getByText(/hover to see colour/i)).toBeHidden();
+
+    const lens = page
+      .getByTestId("project-sleekstore")
+      .locator('[aria-hidden="true"]')
+      .filter({ has: page.locator("img") })
+      .first();
+    await lens.scrollIntoViewIfNeeded();
+    const radius = await lens.evaluate((el) =>
+      getComputedStyle(el).getPropertyValue("--lens-r").trim(),
+    );
+    expect(radius).toBe("150%");
+
+    for (const project of archiveProjects) {
+      const thumb = page.getByTestId(`project-${project.slug}`).locator("img");
+      await thumb.scrollIntoViewIfNeeded();
+      await expect(thumb).toBeVisible();
+    }
   });
 });

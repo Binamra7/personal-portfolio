@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+/* Hover effects are progressive: on touch screens their result is shown by default. */
+@custom-variant hover-device (@media (hover: hover));
+@custom-variant touch-device (@media (hover: none));
+
 /*
  * Design tokens. See docs/DESIGN.md before changing these.
  * Warm near-black, sand highlights, one saffron accent. No purple.
@@ -75,7 +79,8 @@
 
 /* Lens radius animates smoothly because it is a registered property. */
 @property --lens-r {
-  syntax: "<length>";
+  /* length-percentage: touch screens use 150% (full colour), hover uses px. */
+  syntax: "<length-percentage>";
   inherits: true;
   initial-value: 0px;
 }

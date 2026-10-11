@@ -37,8 +37,8 @@ function useFollowPointer() {
 }
 
 /**
- * Older projects as big typographic rows. On desktop, hovering a row shows a
- * screenshot preview that trails the cursor.
+ * Older projects as big typographic rows. Hovering a row shows a screenshot
+ * preview that trails the cursor; touch screens show each screenshot inline.
  */
 export function ArchiveList({ projects }: { projects: Project[] }) {
   const [active, setActive] = useState<string | null>(null);
@@ -76,6 +76,17 @@ export function ArchiveList({ projects }: { projects: Project[] }) {
                 </a>
               </h3>
               <p className="mt-1 text-base text-muted md:hidden">{project.summary}</p>
+              {project.image && (
+                <div className="relative mt-4 touch-device:block hidden aspect-video overflow-hidden rounded-lg ring-1 ring-line">
+                  <Image
+                    src={project.image.src}
+                    alt={project.image.alt}
+                    fill
+                    sizes="(max-width: 640px) 100vw, 640px"
+                    className="object-cover object-top"
+                  />
+                </div>
+              )}
             </div>
             <span className="hidden font-mono text-[13px] text-muted md:block">
               {project.stack.join(" · ")}
@@ -104,7 +115,7 @@ export function ArchiveList({ projects }: { projects: Project[] }) {
       <div
         ref={follow.ref}
         aria-hidden
-        className="pointer-events-none absolute top-0 left-0 z-20 hidden [@media(hover:hover)]:md:block"
+        className="pointer-events-none absolute top-0 left-0 z-20 hidden hover-device:block"
       >
         <div
           data-active={active !== null}

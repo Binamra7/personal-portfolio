@@ -13,6 +13,8 @@ export default defineConfig({
   use: {
     baseURL: `http://localhost:${PORT}`,
     trace: "on-first-retry",
+    // Real browsers block audio until a user gesture; test against that.
+    launchOptions: { args: ["--autoplay-policy=user-gesture-required"] },
   },
   projects: [
     { name: "desktop", use: { ...devices["Desktop Chrome"] } },

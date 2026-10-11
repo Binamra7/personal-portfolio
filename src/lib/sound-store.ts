@@ -3,26 +3,26 @@ import type { AmbientEngine } from "./ambient";
 /**
  * Shared sound state for every toggle.
  *
- * Sound is on by default, but browsers only allow audio after a click, tap or
- * key press (not scrolling), so the default state is "armed" until then. A
- * mute is saved in localStorage. The synth (`./ambient`) is a separate chunk,
- * prefetched when the browser is idle; the AudioContext is created inside the
- * gesture so browsers accept it as user-initiated.
+ * Sound is on by default. Once the page is idle we try to start it; browsers
+ * that allow autoplay (e.g. for sites a visitor uses often) play straight
+ * away. Others keep the AudioContext suspended until a user activation, so
+ * every click, tap or key press retries until audio is actually running.
+ * A mute is saved in localStorage. The synth (`./ambient`) is a lazy chunk.
  */
 export type SoundState = "off" | "armed" | "playing";
 
 const STORAGE_KEY = "sound";
-const GESTURES = ["pointerdown", "keydown", "touchend"] as const;
+// Only some of these grant user activation (e.g. a touch's pointerdown doesn't,
+// its pointerup/touchend do), so keep listening until the context is running.
+const GESTURES = ["pointerdown", "pointerup", "touchend", "click", "keydown"] as const;
 
 let state: SoundState = "armed";
+let ctx: AudioContext | null = null;
 let engine: AmbientEngine | null = null;
 let initialised = false;
 const listeners = new Set<() => void>();
 
 const loadEngine = () => import("./ambient");
-
-// A function, so TypeScript re-reads `state` after an await instead of narrowing it.
-const isOff = () => state === "off";
 
 function setState(next: SoundState) {
   state = next;
@@ -45,41 +45,51 @@ function readPreference(): boolean {
   }
 }
 
-/** Must be called inside a user gesture: the AudioContext is created synchronously. */
-async function play() {
-  if (!engine) {
-    const ctx = new AudioContext();
-    void ctx.resume();
-    const { AmbientEngine } = await loadEngine();
-    engine = new AmbientEngine(ctx);
+/** Marks the context as playing once the browser actually lets it run. */
+function sync() {
+  if (ctx?.state === "running" && state === "armed") {
+    removeGestureListeners();
+    setState("playing");
   }
-  // The visitor may mute while the chunk loads or the context resumes.
-  if (isOff()) return;
-  await engine.start();
-  if (isOff()) engine.stop();
-  else setState("playing");
 }
 
-function stop() {
-  engine?.stop();
+function context() {
+  if (!ctx) {
+    ctx = new AudioContext();
+    ctx.addEventListener("statechange", sync);
+  }
+  return ctx;
 }
 
-function onFirstGesture(event: Event) {
-  // Clicking a sound toggle is handled by `toggle()`; don't race it.
+/** Safe to call with or without a user gesture; within one, it unlocks audio. */
+function tryPlay() {
+  // iOS Safari: play through the silent switch, like a music app.
+  const session = (navigator as Navigator & { audioSession?: { type: string } }).audioSession;
+  if (session) session.type = "playback";
+
+  const audio = context();
+  void audio.resume().then(sync);
+  void loadEngine().then(({ AmbientEngine }) => {
+    engine ??= new AmbientEngine(audio);
+    if (state !== "off") void engine.start();
+  });
+}
+
+function onGesture(event: Event) {
+  // Clicks on a sound toggle are handled by `toggle()`.
   if (event.target instanceof Element && event.target.closest("[data-sound-toggle]")) return;
-  removeGestureListeners();
-  if (state === "armed") void play();
+  if (state === "armed") tryPlay();
 }
 
 function addGestureListeners() {
   for (const type of GESTURES) {
-    window.addEventListener(type, onFirstGesture, { capture: true, passive: true });
+    window.addEventListener(type, onGesture, { capture: true, passive: true });
   }
 }
 
 function removeGestureListeners() {
   for (const type of GESTURES) {
-    window.removeEventListener(type, onFirstGesture, { capture: true });
+    window.removeEventListener(type, onGesture, { capture: true });
   }
 }
 
@@ -111,23 +121,25 @@ export const soundStore = {
       return;
     }
     addGestureListeners();
-    // Warm the synth chunk without competing with page load.
-    const idle = window.requestIdleCallback ?? ((cb: () => void) => setTimeout(cb, 2000));
-    idle(() => void loadEngine());
+    // Try autoplay once the page has finished its own work.
+    const idle = window.requestIdleCallback ?? ((cb: () => void) => setTimeout(cb, 1500));
+    idle(() => {
+      if (state === "armed") tryPlay();
+    });
   },
 
-  /** Must run from a click handler. Armed or off → play; playing → mute. */
+  /** Must run from a click handler. On (armed or playing) → off; off → on. */
   toggle() {
     if (typeof AudioContext === "undefined") return;
-    removeGestureListeners();
-    if (state === "playing") {
-      savePreference(false);
-      setState("off");
-      stop();
-    } else {
+    if (state === "off") {
       savePreference(true);
       setState("armed");
-      void play();
+      tryPlay();
+    } else {
+      savePreference(false);
+      removeGestureListeners();
+      setState("off");
+      engine?.stop();
     }
   },
 };

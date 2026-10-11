@@ -74,6 +74,14 @@ The screenshots are old, bright and inconsistent. They're treated as prints:
 
 Better screenshots can be dropped in later without any layout change.
 
+## Touch screens
+
+Hover effects are progressive: on touch screens their result is the default.
+Use the `hover-device:` / `touch-device:` variants (defined in `globals.css`).
+
+- Featured screenshots show full colour (no lens, no hint).
+- Archive rows show their screenshot inline instead of a hover preview.
+
 ## Motion inventory
 
 | Where           | What                                                           | How                    |
@@ -107,7 +115,11 @@ pentatonic chimes every 3–8s through a generated reverb.
 - **Loudness target:** about −26 dBFS RMS in the audible band. The e2e test
   `the soundtrack is audible on small speakers, but quiet` measures it and
   fails outside −34 to −18 dB. Re-run it after any change to the mix.
-- **States:** "Tap for sound" (armed: on by default, but browsers block audio
-  until the first click, tap or key), "Sound on" (playing), "Sound off" (muted,
-  remembered). Clicking an armed toggle starts playback. Toggles in the top bar
-  and dock share state through `lib/sound-store.ts`.
+- **On by default.** At idle the store tries to start; browsers that allow
+  autoplay play immediately. Others keep the AudioContext suspended until a
+  user activation, so every click, tap or key press retries until audio is
+  actually running. (A touch's `pointerdown` doesn't count, its
+  `pointerup`/`touchend` does; never stop listening after the first event.)
+  On iOS, `navigator.audioSession.type = "playback"` plays through the silent
+  switch. The toggle reads "Sound on"; bars animate once audio really runs. A
+  mute is remembered.

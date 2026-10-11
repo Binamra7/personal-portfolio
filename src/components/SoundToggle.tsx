@@ -4,8 +4,8 @@ import { useEffect, useSyncExternalStore } from "react";
 import { soundStore } from "@/lib/sound-store";
 
 /**
- * Toggles the ambient soundtrack. On by default, but "armed" ("Tap for sound")
- * until the first click/tap/key, because browsers block autoplay.
+ * Toggles the ambient soundtrack (on by default). The bars animate only once
+ * audio is actually running; until the browser allows it they rest in accent.
  * `withLabel` adds visible text.
  */
 export function SoundToggle({ withLabel = false }: { withLabel?: boolean }) {
@@ -16,8 +16,8 @@ export function SoundToggle({ withLabel = false }: { withLabel?: boolean }) {
   );
   useEffect(() => soundStore.init(), []);
 
+  const on = state !== "off";
   const playing = state === "playing";
-  const label = { armed: "Tap for sound", playing: "Sound on", off: "Sound off" }[state];
 
   return (
     <button
@@ -25,9 +25,9 @@ export function SoundToggle({ withLabel = false }: { withLabel?: boolean }) {
       data-sound-toggle
       data-state={state}
       onClick={soundStore.toggle}
-      aria-pressed={playing}
-      aria-label={playing ? "Mute ambient sound" : "Play ambient sound"}
-      title={playing ? "Mute" : "Play ambient sound"}
+      aria-pressed={on}
+      aria-label={on ? "Mute ambient sound" : "Play ambient sound"}
+      title={on ? "Mute" : "Play ambient sound"}
       className={`group flex h-10 items-center justify-center gap-2.5 rounded-full text-muted transition-colors hover:bg-fg/10 hover:text-fg ${
         withLabel ? "px-3" : "w-10"
       }`}
@@ -48,7 +48,7 @@ export function SoundToggle({ withLabel = false }: { withLabel?: boolean }) {
       </span>
       {withLabel && (
         <span aria-hidden className="font-mono text-[13px]">
-          {label}
+          {on ? "Sound on" : "Sound off"}
         </span>
       )}
     </button>
