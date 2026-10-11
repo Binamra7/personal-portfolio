@@ -1,0 +1,126 @@
+@import "tailwindcss";
+
+/*
+ * Design tokens. See docs/DESIGN.md before changing these.
+ * One warm accent on a warm near-black. No purple, no gradients-as-decoration.
+ */
+@theme {
+  --color-bg: #0b0b0a;
+  --color-surface: #141412;
+  --color-raised: #1c1c19;
+  --color-line: rgb(236 235 228 / 0.09);
+  --color-line-strong: rgb(236 235 228 / 0.18);
+  --color-fg: #ecebe4;
+  --color-muted: #adaba2;
+  --color-faint: #8a8880;
+  --color-accent: #f2a541;
+
+  --font-sans: var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;
+
+  --ease-out-soft: cubic-bezier(0.2, 0.7, 0.2, 1);
+
+  --animate-rise: rise 0.9s var(--ease-out-soft) both;
+
+  @keyframes rise {
+    from {
+      transform: translateY(105%);
+    }
+    to {
+      transform: translateY(0);
+    }
+  }
+}
+
+@layer base {
+  html {
+    color-scheme: dark;
+    scroll-behavior: smooth;
+    /* Keeps anchored sections clear of the fixed header. */
+    scroll-padding-top: 5rem;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    @apply bg-bg font-sans text-fg antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    @apply bg-accent text-bg;
+  }
+
+  :focus-visible {
+    @apply rounded-sm outline-2 outline-offset-4 outline-accent;
+  }
+
+  /* Film grain over everything: keeps the flat dark background from banding
+     and helps low-res screenshots sit in the page. */
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    pointer-events: none;
+    opacity: 0.05;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+}
+
+/* Scroll reveal. Only hides content when JS is running (`.js` is set by an
+   inline script in the layout), so no-JS visitors still see everything. */
+.js [data-reveal] {
+  opacity: 0;
+  transform: translateY(1.25rem);
+  transition:
+    opacity 0.8s var(--ease-out-soft),
+    transform 0.8s var(--ease-out-soft);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+
+.js [data-reveal][data-visible="true"] {
+  opacity: 1;
+  transform: none;
+}
+
+/* Screenshot treatment: muted and dimmed by default so bright, mismatched
+   screenshots blend into the dark page; full colour on hover/focus. */
+.shot-img {
+  filter: grayscale(0.9) brightness(0.52) contrast(1.1);
+  transition:
+    filter 0.7s var(--ease-out-soft),
+    transform 0.9s var(--ease-out-soft);
+}
+
+.group:hover .shot-img,
+.group:focus-within .shot-img {
+  filter: grayscale(0) brightness(0.9) contrast(1);
+  transform: scale(1.025);
+}
+
+/* Touch screens can't hover, so give them a gentler middle ground. */
+@media (hover: none) {
+  .shot-img {
+    filter: grayscale(0.35) brightness(0.8);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
+  }
+
+  .js [data-reveal] {
+    opacity: 1;
+    transform: none;
+  }
+}
