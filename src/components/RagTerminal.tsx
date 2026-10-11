@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { onceInView } from "@/lib/in-view";
 import { prefersReducedMotion } from "@/lib/scroll-progress";
 
@@ -33,7 +33,7 @@ export function RagTerminal() {
   const ref = useRef<HTMLDivElement>(null);
   const [typed, setTyped] = useState(TOTAL);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const node = ref.current;
     if (!node || prefersReducedMotion() || typeof IntersectionObserver === "undefined") return;
 
@@ -68,7 +68,7 @@ export function RagTerminal() {
       <pre
         role="img"
         aria-label="Example session: the assistant answers a question from notes and cites its source"
-        className="flex-1 overflow-hidden px-5 py-8 font-mono text-[12px] leading-relaxed sm:text-sm md:px-10 md:py-14 md:text-lg"
+        className="flex-1 overflow-hidden whitespace-pre-wrap break-words px-5 py-8 font-mono text-[12px] leading-relaxed sm:text-sm md:px-10 md:py-14 md:text-lg"
       >
         {TERMINAL_SCRIPT.map((line, i) => {
           const shown = Math.max(0, Math.min(line.text.length, typed - (LINE_STARTS[i] ?? 0)));

@@ -66,7 +66,7 @@ export function Dock() {
       data-shown={shown}
       className="fixed bottom-4 left-1/2 z-50 -translate-x-1/2 transition-[translate,opacity] duration-700 ease-[var(--ease-out-expo)] focus-within:translate-y-0! focus-within:opacity-100! data-[shown=false]:translate-y-[160%] data-[shown=false]:opacity-0 md:bottom-6"
     >
-      <div className="relative flex items-center gap-0.5 overflow-hidden rounded-full border border-line bg-raised/75 p-1.5 shadow-2xl shadow-black/50 backdrop-blur-xl">
+      <div className="relative flex items-center gap-0.5 overflow-hidden rounded-full border border-line bg-raised/75 p-1.5 shadow-2xl shadow-black/50 backdrop-blur-xl max-[379px]:p-1">
         <span aria-hidden className="page-progress absolute inset-x-6 bottom-0 h-px bg-accent" />
         <ul ref={listRef} className="relative flex items-center">
           <li
@@ -85,7 +85,7 @@ export function Dock() {
                 <a
                   href={item.href}
                   aria-current={isActive ? "location" : undefined}
-                  className={`relative block rounded-full px-3 py-2.5 font-mono text-[13px] transition-colors duration-300 sm:px-4 ${
+                  className={`relative block rounded-full px-3 py-2.5 font-mono text-[13px] transition-colors duration-300 max-[379px]:px-2 sm:px-4 ${
                     isActive ? "text-bg" : "text-muted hover:text-fg"
                   }`}
                 >
@@ -95,7 +95,7 @@ export function Dock() {
             );
           })}
         </ul>
-        <span className="mx-1 h-5 w-px bg-line-strong" aria-hidden />
+        <span className="mx-1 h-5 w-px bg-line-strong max-[379px]:mx-0.5" aria-hidden />
         <SoundToggle />
       </div>
     </nav>

@@ -22,10 +22,7 @@ export function HeroHeadline({ lines, srPrefix }: { lines: Line[]; srPrefix: str
   );
 
   return (
-    <h1
-      ref={ref}
-      className="condensed text-[clamp(3.4rem,13.5vw,13.5rem)] uppercase leading-[0.84]"
-    >
+    <h1 ref={ref} className="condensed text-[clamp(3rem,13.5vw,13.5rem)] uppercase leading-[0.84]">
       <span className="sr-only">{srPrefix}</span>
       {lines.map((line, i) => (
         <span

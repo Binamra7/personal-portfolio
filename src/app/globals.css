@@ -91,6 +91,14 @@
     -webkit-tap-highlight-color: transparent;
   }
 
+  /* Decorations (glows, the archive preview) may extend past the edge; never
+     scroll sideways. Set on both: body's overflow is otherwise moved to the
+     viewport, where it no longer clips the body's content. */
+  html,
+  body {
+    overflow-x: clip;
+  }
+
   body {
     @apply bg-bg font-sans text-fg antialiased;
     text-rendering: optimizeLegibility;

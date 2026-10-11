@@ -25,6 +25,12 @@ npx playwright test --ui
 - E2E serves `out/` with `scripts/serve-static.mjs`, which handles clean URLs and
   404s the way Vercel does.
 - `next/image` is mocked to a plain `<img>` in `src/test/setup.tsx`.
+- `sound-store.test.ts` stubs `AudioContext` with a fake whose `resume()`
+  only succeeds when "allowed", to test autoplay, gesture retries, hidden tabs
+  and mutes. Each test loads a fresh store module and removes its listeners.
+- `toBeVisible()` treats `opacity: 0` as visible. For reveal or fade effects,
+  assert `data-visible` / `data-active` or `toHaveCSS("opacity", "1")`.
+  After writing a test, break the feature once to confirm the test fails.
 - jsdom has no IntersectionObserver or AudioContext. Components fall back to
   their final, static state there, which is also what no-JS visitors see.
 - `AmbientEngine` takes a context factory, so `ambient.test.ts` passes in a

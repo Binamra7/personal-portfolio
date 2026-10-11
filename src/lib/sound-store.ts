@@ -61,12 +61,21 @@ function context() {
   return ctx;
 }
 
+/**
+ * iOS audio session. "ambient" mixes with whatever the visitor is already
+ * playing and respects the silent switch, which is right for sound that starts
+ * by itself. "playback" (exclusive, ignores the switch) is used only after the
+ * visitor explicitly turns sound on.
+ */
+function setAudioSession(type: "ambient" | "playback") {
+  const session = (navigator as Navigator & { audioSession?: { type: string } }).audioSession;
+  if (session) session.type = type;
+}
+
 /** Safe to call with or without a user gesture; within one, it unlocks audio. */
 function tryPlay() {
-  // iOS Safari: play through the silent switch, like a music app.
-  const session = (navigator as Navigator & { audioSession?: { type: string } }).audioSession;
-  if (session) session.type = "playback";
-
+  // Never start in a tab the visitor isn't looking at; onVisibility retries.
+  if (document.hidden) return;
   const audio = context();
   void audio.resume().then(sync);
   void loadEngine().then(({ AmbientEngine }) => {
@@ -94,6 +103,7 @@ function removeGestureListeners() {
 }
 
 function onVisibility() {
+  if (state === "armed" && !document.hidden) tryPlay();
   if (state !== "playing") return;
   if (document.hidden) engine?.stop();
   else void engine?.start();
@@ -120,6 +130,7 @@ export const soundStore = {
       setState("off");
       return;
     }
+    setAudioSession("ambient");
     addGestureListeners();
     // Try autoplay once the page has finished its own work.
     const idle = window.requestIdleCallback ?? ((cb: () => void) => setTimeout(cb, 1500));
@@ -133,6 +144,7 @@ export const soundStore = {
     if (typeof AudioContext === "undefined") return;
     if (state === "off") {
       savePreference(true);
+      setAudioSession("playback");
       setState("armed");
       tryPlay();
     } else {

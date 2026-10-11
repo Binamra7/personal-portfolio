@@ -211,7 +211,6 @@ export type Education = {
   period: string;
   degree: string;
   field: string;
-  school: string;
   university: string;
   place: string;
 };
@@ -221,7 +220,6 @@ export const education: Education[] = [
     period: "2021 — 2025",
     degree: "B.Sc. CSIT",
     field: "Computer Science & Information Technology",
-    school: "Trinity College",
     university: "Tribhuvan University",
     place: "Kathmandu",
   },

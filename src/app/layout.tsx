@@ -44,8 +44,11 @@ export const viewport: Viewport = {
   colorScheme: "dark",
 };
 
-// Set before first paint so reveal styles only hide content when JS can show it again.
-const jsFlag = "document.documentElement.classList.add('js')";
+// Set before first paint so reveal styles only hide content when JS can show it
+// again. If the app bundle never runs (blocked, failed), drop the flag after 4s
+// so content isn't stuck invisible. Reveal sets data-hydrated when it mounts.
+const jsFlag =
+  "var d=document.documentElement;d.classList.add('js');setTimeout(function(){if(!('hydrated' in d.dataset))d.classList.remove('js')},4000)";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (

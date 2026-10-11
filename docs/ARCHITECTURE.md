@@ -27,9 +27,14 @@ Content is typed (`Project`, `Role`, `Stat`, `ToolGroup`) and validated by
 - Hero animations are pure CSS, so they start before hydration and don't hold
   back LCP.
 - Reveal-on-scroll content is only hidden when the `.js` class is present (set by
-  an inline script in `layout.tsx`). Without JS, everything is visible.
-- `CountUp` and `RagTerminal` render their final state on the server. The
-  client rewinds them before the first paint, then animates.
+  an inline script in `layout.tsx`). Without JS, everything is visible. If the
+  app bundle fails to load, the script removes `.js` after 4s (Reveal marks the
+  page `data-hydrated` when it mounts), so content never stays invisible.
+- `CountUp` and `RagTerminal` render their final state in the HTML (right for
+  no-JS and crawlers). On hydration they reset and animate; the hero's fade-in
+  and the terminal's below-the-fold position hide that reset in practice.
+- `html, body { overflow-x: clip }`: decorations may extend past the edge, but
+  the page never scrolls sideways (down to 320px; an e2e test checks it).
 - Visitors who prefer reduced motion get no Lenis, no scroll-linked motion and
   instant transitions.
 
@@ -55,12 +60,15 @@ Images use `fill` inside fixed-aspect boxes, so layout never shifts.
 
 ## Audio
 
-Sound is on by default, but browsers only allow audio after a click, tap or
-key press, so `sound-store.ts` waits ("armed") for the first one. The
-AudioContext is created synchronously inside that gesture; the synth code
-(`lib/ambient.ts`, ~1 KB) is a separate chunk, prefetched when the browser is
-idle. A mute is saved in localStorage. All toggles read the same store via
-`useSyncExternalStore`.
+Sound is on by default (state "armed"). When the page is idle and visible,
+`sound-store.ts` creates the AudioContext, loads the synth chunk
+(`lib/ambient.ts`, ~1 KB) and tries to start. Browsers that allow autoplay
+play right away. Others keep the context suspended, so every click, tap or key
+press calls `resume()` again until the context is actually running, and only
+then does the state become "playing". It never starts in a hidden tab.
+A mute is saved in localStorage. All toggles read the same store via
+`useSyncExternalStore`. `sound-store.test.ts` covers these paths against a fake
+AudioContext.
 
 ## Scroll-linked animation
 

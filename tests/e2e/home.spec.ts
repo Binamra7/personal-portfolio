@@ -38,10 +38,36 @@ test.describe("home page", () => {
     await expect(page.getByText("1.2s", { exact: true })).toBeVisible({ timeout: 5000 });
   });
 
-  test("sections become visible when scrolled to", async ({ page }) => {
+  test("sections reveal when scrolled to", async ({ page }) => {
     await page.goto("/");
+    const block = page.locator("#contact [data-reveal]").first();
+    // toBeVisible() treats opacity:0 as visible, so check the reveal state itself.
+    await expect(block).toHaveAttribute("data-visible", "false");
     await page.locator("#contact").scrollIntoViewIfNeeded();
-    await expect(page.getByRole("heading", { name: /let.s talk/i })).toBeVisible();
+    await expect(block).toHaveAttribute("data-visible", "true");
+    await expect(block).toHaveCSS("opacity", "1");
+  });
+
+  test("content still appears if the app bundle fails to load", async ({ page }) => {
+    await page.route("**/_next/static/chunks/**", (route) => route.abort());
+    await page.goto("/");
+    const block = page.locator("#contact [data-reveal]").first();
+    await expect(block).toHaveCSS("opacity", "1", { timeout: 8000 });
+  });
+
+  test("never scrolls sideways, even on a 320px screen", async ({ browser }) => {
+    const page = await browser.newPage({ viewport: { width: 320, height: 640 } });
+    await page.goto("/");
+    await page.mouse.wheel(0, 1200);
+    const scrollX = await page.evaluate(() => {
+      window.scrollTo(100, window.scrollY);
+      return window.scrollX;
+    });
+    expect(scrollX).toBe(0);
+    const dock = await page.locator('nav[aria-label="Main"] > div').boundingBox();
+    expect(dock?.x ?? -1).toBeGreaterThanOrEqual(0);
+    expect((dock?.x ?? 0) + (dock?.width ?? 0)).toBeLessThanOrEqual(320);
+    await page.close();
   });
 
   test("has no detectable accessibility violations", async ({ page }) => {
@@ -56,7 +82,13 @@ test.describe("home page", () => {
     expect((await request.get("/sitemap.xml")).ok()).toBe(true);
     const og = await request.get("/opengraph-image.png");
     expect(og.headers()["content-type"]).toBe("image/png");
-    if (profile.resumeUrl) expect((await request.get(profile.resumeUrl)).ok()).toBe(true);
+    if (profile.resumeUrl) {
+      const resume = await request.get(profile.resumeUrl);
+      expect(resume.headers()["content-type"]).toBe("application/pdf");
+    }
+    // A malformed URL must not crash the static server.
+    expect((await request.get("/%E0%A4%A")).status()).toBe(404);
+    expect((await request.get("/")).ok()).toBe(true);
   });
 
   test("unknown routes show the 404 page", async ({ page }) => {
@@ -133,12 +165,13 @@ test.describe("project visuals", () => {
   test("archive rows show a preview on hover (desktop)", async ({ page, isMobile }) => {
     test.skip(isMobile, "hover previews are desktop only");
     await page.goto("/");
+    const preview = page.locator('ul[aria-label="Earlier projects"] [data-active]');
+    await expect(preview).toHaveAttribute("data-active", "false");
     const row = page.getByTestId(`project-${archiveProjects[0]?.slug}`);
     await row.scrollIntoViewIfNeeded();
     await row.hover();
-    await expect(
-      page.locator('ul[aria-label="Earlier projects"] [aria-hidden] img').first(),
-    ).toBeVisible();
+    await expect(preview).toHaveAttribute("data-active", "true");
+    await expect(preview).toHaveCSS("opacity", "1");
   });
 });
 

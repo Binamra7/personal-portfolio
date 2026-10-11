@@ -29,7 +29,7 @@ function FeaturedProject({ project, index }: { project: Project; index: number }
       </Reveal>
 
       {project.image ? (
-        <LensImage src={project.image.src} alt={project.image.alt} priority={index === 0} />
+        <LensImage src={project.image.src} alt={project.image.alt} />
       ) : (
         project.visual === "rag-terminal" && <RagTerminal />
       )}

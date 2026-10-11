@@ -17,7 +17,7 @@ export function Education() {
             period={entry.period}
             title={entry.degree}
             subtitle={entry.field}
-            lines={[entry.school, `${entry.university}, ${entry.place}`]}
+            lines={[`${entry.university}, ${entry.place}`]}
           />
         ))}
       </ol>

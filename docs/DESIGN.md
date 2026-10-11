@@ -67,9 +67,10 @@ The screenshots are old, bright and inconsistent. They're treated as prints:
 - **Colour lens**: a 170px circle follows the mouse and shows the real
   colours (a second copy of the image clipped with
   `circle(var(--lens-r) at var(--x) var(--y))`; `--lens-r` is a registered
-  `@property`, so the radius animates). Tapping on touch screens toggles full colour.
+  `@property` with `<length-percentage>` syntax, so the radius animates and
+  touch screens can use `150%`, which is full colour by default).
 - **Archive previews**: `ArchiveList` shows a tilted, full-colour thumbnail that
-  trails the cursor on a spring. Desktop only.
+  trails the cursor. On touch screens each row shows its screenshot inline.
 - Projects with no screenshot use a built-in visual (`RagTerminal`).
 
 Better screenshots can be dropped in later without any layout change.
@@ -120,6 +121,10 @@ pentatonic chimes every 3–8s through a generated reverb.
   user activation, so every click, tap or key press retries until audio is
   actually running. (A touch's `pointerdown` doesn't count, its
   `pointerup`/`touchend` does; never stop listening after the first event.)
-  On iOS, `navigator.audioSession.type = "playback"` plays through the silent
-  switch. The toggle reads "Sound on"; bars animate once audio really runs. A
-  mute is remembered.
+  Never starts in a background tab.
+- **iOS audio session:** `"ambient"` by default, so it mixes with the visitor's
+  own music or podcast and respects the silent switch. Use `"playback"`
+  (exclusive, ignores the switch) only after an explicit "turn sound on" click.
+  Auto-starting sound must never interrupt someone's audio.
+- The toggle reads "Sound on"; bars animate once audio really runs. A mute is
+  remembered.

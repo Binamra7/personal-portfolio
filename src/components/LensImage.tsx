@@ -7,7 +7,6 @@ import { useScrollProgress } from "@/lib/scroll-progress";
 type LensImageProps = {
   src: string;
   alt: string;
-  priority?: boolean;
 };
 
 /**
@@ -15,7 +14,7 @@ type LensImageProps = {
  * slight parallax (`.lens-parallax`). On hover devices a circular lens under
  * the pointer shows the real colours; touch screens show full colour.
  */
-export function LensImage({ src, alt, priority = false }: LensImageProps) {
+export function LensImage({ src, alt }: LensImageProps) {
   const ref = useRef<HTMLDivElement>(null);
   useScrollProgress(ref, [
     ["start", 1],
@@ -49,7 +48,6 @@ export function LensImage({ src, alt, priority = false }: LensImageProps) {
             src={src}
             alt={alt}
             fill
-            priority={priority}
             sizes="(min-width: 1280px) 1200px, 100vw"
             className="object-cover object-top"
           />

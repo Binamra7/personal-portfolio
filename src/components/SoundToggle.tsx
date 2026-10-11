@@ -29,7 +29,7 @@ export function SoundToggle({ withLabel = false }: { withLabel?: boolean }) {
       aria-label={on ? "Mute ambient sound" : "Play ambient sound"}
       title={on ? "Mute" : "Play ambient sound"}
       className={`group flex h-10 items-center justify-center gap-2.5 rounded-full text-muted transition-colors hover:bg-fg/10 hover:text-fg ${
-        withLabel ? "px-3" : "w-10"
+        withLabel ? "px-3" : "w-10 max-[379px]:w-8"
       }`}
     >
       <span

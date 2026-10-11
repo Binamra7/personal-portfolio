@@ -10,7 +10,7 @@ import { ScaleIn } from "./scroll/ScaleIn";
 export function Contact() {
   return (
     <section
-      aria-labelledby="contact-title"
+      aria-label="Contact"
       id="contact"
       className="relative overflow-x-clip pt-28 pb-16 md:pt-40"
     >
@@ -21,14 +21,14 @@ export function Contact() {
 
         <Reveal>
           <ScaleIn>
-            <h2
+            <h3
               id="contact-title"
               className="font-bold font-display text-[clamp(3.25rem,14.5vw,15rem)] uppercase leading-[0.8]"
             >
               <StretchText>
                 Let&rsquo;s talk<span className="text-accent">.</span>
               </StretchText>
-            </h2>
+            </h3>
           </ScaleIn>
         </Reveal>
 

@@ -25,12 +25,19 @@ const types = {
   ".svg": "image/svg+xml",
   ".png": "image/png",
   ".webp": "image/webp",
+  ".pdf": "application/pdf",
   ".ico": "image/x-icon",
   ".woff2": "font/woff2",
 };
 
 async function resolveFile(urlPath) {
-  const safe = normalize(decodeURIComponent(urlPath)).replace(/^(\.\.[/\\])+/, "");
+  let decoded;
+  try {
+    decoded = decodeURIComponent(urlPath);
+  } catch {
+    return null; // malformed escape: treat as not found instead of crashing
+  }
+  const safe = normalize(decoded).replace(/^(\.\.[/\\])+/, "");
   const base = join(root, safe);
   if (!base.startsWith(root)) return null;
 

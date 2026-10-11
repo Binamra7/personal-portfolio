@@ -24,6 +24,7 @@ export function Reveal({ children, as: Tag = "div", delay = 0, className }: Reve
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
+    document.documentElement.dataset.hydrated = "";
     if (!ref.current) return;
     return onceInView(ref.current, () => setVisible(true), { rootMargin: "0px 0px -10% 0px" });
   }, []);
