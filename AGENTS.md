@@ -47,7 +47,7 @@ src/
   app/
     layout.tsx         fonts, metadata, Lenis, `.js` flag script
     page.tsx           section order (+ Dock)
-    globals.css        tokens (@theme), keyframes, duotone, reveal, `condensed`/`stretchy`
+    globals.css        tokens (@theme), keyframes, duotone, reveal, `condensed`
     opengraph-image.png, icon.svg, sitemap.ts, robots.ts, not-found.tsx
   components/
     Hero, Work, Career, Stack, Contact, SiteFooter     sections (server)
@@ -57,6 +57,9 @@ src/
     RagTerminal    typed terminal illustration (client)
     CountUp        animated stat numbers (client)
     Reveal         fade-up on scroll (client, CSS-driven)
+    StretchText    hover-widening text that reserves its width (no reflow)
+    scroll/        scroll-linked effects: HeroHeadline, ScrollFillText,
+                   DriftRow, ScrollProgressLine, ScaleIn
     SmoothScroll   Lenis (client)
     icons.tsx      inline SVG icons
   hooks/useActiveSection.ts
@@ -74,7 +77,7 @@ docs/                  see below
 - Server components by default. Use `"use client"` only for state, effects or
   motion, and keep those components small and leaf-level.
 - Style with Tailwind utilities and theme tokens (`bg-bg`, `text-muted`,
-  `text-accent`, `border-line`, `condensed`, `stretchy`). No hard-coded hex in
+  `text-accent`, `border-line`, `condensed`). No hard-coded hex in
   components. New tokens go in `@theme` and in `docs/DESIGN.md`.
 - Copy is short. Unit tests enforce lengths for summaries, highlights, hero
   lines and stat labels.
@@ -82,6 +85,9 @@ docs/                  see below
   for scroll-linked or spring/layout effects. Everything must respect
   `prefers-reduced-motion` (CSS handles it globally; motion components check
   `useReducedMotion`).
+- **Hover/scroll effects must not change layout.** Animate transforms,
+  opacity, colour or background position. To widen text on hover, use
+  `<StretchText>`. An e2e test fails if hovering resizes anything.
 - Accessibility is tested (axe in e2e). One `h1`; each section has an `h2`
   (via `SectionLabel`); icon-only controls get `aria-label`; text contrast ≥ 4.5:1.
 - External links: `target="_blank" rel="noreferrer"`.

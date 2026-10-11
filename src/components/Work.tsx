@@ -5,6 +5,7 @@ import { ProjectLinks } from "./ProjectLinks";
 import { RagTerminal } from "./RagTerminal";
 import { Reveal } from "./Reveal";
 import { SectionLabel } from "./SectionLabel";
+import { ScrollFillText } from "./scroll/ScrollFillText";
 
 function FeaturedProject({ project, index }: { project: Project; index: number }) {
   return (
@@ -25,7 +26,7 @@ function FeaturedProject({ project, index }: { project: Project; index: number }
           id={`${project.slug}-title`}
           className="condensed mb-6 text-[clamp(3rem,11vw,10rem)] uppercase leading-[0.85] md:mb-8"
         >
-          {project.title}
+          <ScrollFillText>{project.title}</ScrollFillText>
         </h3>
       </Reveal>
 

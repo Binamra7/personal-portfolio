@@ -105,3 +105,41 @@ test.describe("project visuals", () => {
     ).toBeVisible();
   });
 });
+
+test.describe("layout stability", () => {
+  // Hover effects must never reflow the page (regression: width-animated
+  // headings used to wrap onto new lines and push content down).
+  test("hovering headings and rows never changes the layout", async ({ page, isMobile }) => {
+    test.skip(isMobile, "hover only");
+    test.setTimeout(90_000);
+    await page.goto("/");
+    const targets = page.locator(
+      '#contact-title, #career h3, ul[aria-label="Earlier projects"] article, #stack p > span:first-child',
+    );
+    const count = await targets.count();
+    for (let i = 0; i < count; i++) {
+      const el = targets.nth(i);
+      await el.scrollIntoViewIfNeeded();
+      await page.mouse.move(1, 1);
+      await page.waitForTimeout(300);
+      const before = await el.boundingBox();
+      const docBefore = await page.evaluate(() => document.documentElement.scrollHeight);
+      await el.hover();
+      await page.waitForTimeout(800);
+      const after = await el.boundingBox();
+      const docAfter = await page.evaluate(() => document.documentElement.scrollHeight);
+      expect(Math.round(after?.height ?? 0)).toBe(Math.round(before?.height ?? 0));
+      expect(docAfter).toBe(docBefore);
+    }
+  });
+
+  test("the hero headline keeps its height while animating in", async ({ page }) => {
+    await page.goto("/");
+    const heights = new Set<number>();
+    for (let t = 0; t < 8; t++) {
+      heights.add(Math.round((await page.locator("h1").boundingBox())?.height ?? 0));
+      await page.waitForTimeout(200);
+    }
+    expect(heights.size).toBe(1);
+  });
+});

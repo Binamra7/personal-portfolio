@@ -75,15 +75,6 @@
   letter-spacing: -0.02em;
 }
 
-@utility stretchy {
-  font-family: var(--font-display);
-  font-variation-settings: "wdth" 75;
-  transition: font-variation-settings 0.6s var(--ease-out-expo);
-  &:hover {
-    font-variation-settings: "wdth" 100;
-  }
-}
-
 /* Lens radius animates smoothly because it is a registered property. */
 @property --lens-r {
   syntax: "<length>";

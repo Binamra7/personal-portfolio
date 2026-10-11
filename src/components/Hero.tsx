@@ -1,7 +1,7 @@
-import type { CSSProperties } from "react";
 import { heroIntro, heroLines, profile, stats } from "@/content/site";
 import { CountUp } from "./CountUp";
 import { ArrowDown, ArrowUpRight } from "./icons";
+import { HeroHeadline } from "./scroll/HeroHeadline";
 import { TopBar } from "./TopBar";
 
 export function Hero() {
@@ -28,19 +28,7 @@ export function Hero() {
           {profile.name} — {profile.role}
         </p>
 
-        <h1 className="condensed text-[clamp(3.4rem,13.5vw,13.5rem)] uppercase leading-[0.84]">
-          <span className="sr-only">{profile.name}: </span>
-          {heroLines.map((line, i) => (
-            <span key={line.text} className="block overflow-hidden pt-[0.04em]">
-              <span
-                className={`block animate-settle ${line.accent ? "text-accent" : ""}`}
-                style={{ animationDelay: `${150 + i * 120}ms` } as CSSProperties}
-              >
-                {line.text}
-              </span>
-            </span>
-          ))}
-        </h1>
+        <HeroHeadline lines={heroLines} srPrefix={`${profile.name}: `} />
 
         <div className="mt-12 grid gap-12 md:mt-16 lg:grid-cols-[1fr_1.25fr] lg:items-end">
           <div className="animate-fade-up [animation-delay:700ms]">

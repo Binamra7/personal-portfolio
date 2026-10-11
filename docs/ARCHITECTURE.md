@@ -8,7 +8,10 @@
   `opengraph-image.png`.
 - Sections are server components. Client components are leaves:
   `Dock`, `SoundToggle`, `LocalClock`, `SmoothScroll`, `Reveal`, `CountUp`,
-  `LensImage`, `ArchiveList`, `RagTerminal`, `CopyEmailButton`.
+  `LensImage`, `ArchiveList`, `RagTerminal`, `CopyEmailButton`, and the
+  scroll effects in `components/scroll/` (`HeroHeadline`, `ScrollFillText`,
+  `DriftRow`, `ScrollProgressLine`, `ScaleIn`). These animate transforms or
+  background position only, never layout.
 
 ## Data flow
 
@@ -33,8 +36,7 @@ Content is typed (`Project`, `Role`, `Stat`, `ToolGroup`) and validated by
 ## Styling
 
 Tailwind v4 is configured in CSS (`@theme` in `globals.css`). The custom CSS
-that isn't a utility lives there too: keyframes, `condensed`/`stretchy`
-utilities, the `--lens-r` `@property`, the duotone, reveal states, Lenis base
+that isn't a utility lives there too: keyframes, the `condensed` utility, the `--lens-r` `@property`, the duotone, reveal states, Lenis base
 styles, film grain and the reduced-motion overrides.
 
 ## Fonts

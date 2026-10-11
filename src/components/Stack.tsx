@@ -1,16 +1,18 @@
 import { toolkit } from "@/content/site";
 import { Reveal } from "./Reveal";
 import { SectionLabel } from "./SectionLabel";
+import { DriftRow } from "./scroll/DriftRow";
 
 /**
- * The toolkit as one flowing block of big type. Hovering a tool dims the rest.
+ * The toolkit as one flowing block of big type. Rows drift in alternating
+ * directions while scrolling; hovering a tool dims the rest.
  */
 export function Stack() {
   return (
     <section
       aria-label="Stack"
       id="stack"
-      className="mx-auto max-w-7xl px-5 py-28 md:px-10 md:py-40"
+      className="mx-auto max-w-7xl overflow-x-clip px-5 py-28 md:px-10 md:py-40"
     >
       <SectionLabel index="03" label="Stack" aside="Daily drivers" />
 
@@ -27,16 +29,18 @@ export function Stack() {
               >
                 {group.label}
               </span>
-              <p className="condensed flex flex-wrap gap-x-5 text-[clamp(2.4rem,5.6vw,5.25rem)] uppercase leading-[1.02] md:gap-x-7">
-                {group.items.map((item) => (
-                  <span
-                    key={item}
-                    className="hover:!opacity-100 transition-[opacity,color] duration-300 hover:text-accent group-hover/stack:opacity-25"
-                  >
-                    {item}
-                  </span>
-                ))}
-              </p>
+              <DriftRow direction={i % 2 === 0 ? 1 : -1} distance={3}>
+                <p className="condensed flex flex-wrap gap-x-5 text-[clamp(2.4rem,5.6vw,5.25rem)] uppercase leading-[1.02] md:gap-x-7">
+                  {group.items.map((item) => (
+                    <span
+                      key={item}
+                      className="hover:!opacity-100 transition-[opacity,color] duration-300 hover:text-accent group-hover/stack:opacity-25"
+                    >
+                      {item}
+                    </span>
+                  ))}
+                </p>
+              </DriftRow>
             </div>
           </Reveal>
         ))}

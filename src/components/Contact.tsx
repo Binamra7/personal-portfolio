@@ -3,6 +3,8 @@ import { CopyEmailButton } from "./CopyEmailButton";
 import { ArrowUpRight, socialIcons } from "./icons";
 import { Reveal } from "./Reveal";
 import { SectionLabel } from "./SectionLabel";
+import { StretchText } from "./StretchText";
+import { ScaleIn } from "./scroll/ScaleIn";
 
 export function Contact() {
   return (
@@ -23,12 +25,16 @@ export function Contact() {
         <SectionLabel index="04" label="Contact" aside={`${profile.city}, ${profile.country}`} />
 
         <Reveal>
-          <h2
-            id="contact-title"
-            className="stretchy font-bold text-[clamp(4.5rem,21vw,20rem)] uppercase leading-[0.8]"
-          >
-            Let&rsquo;s talk<span className="text-accent">.</span>
-          </h2>
+          <ScaleIn>
+            <h2
+              id="contact-title"
+              className="font-bold font-display text-[clamp(3.25rem,14.5vw,15rem)] uppercase leading-[0.8]"
+            >
+              <StretchText>
+                Let&rsquo;s talk<span className="text-accent">.</span>
+              </StretchText>
+            </h2>
+          </ScaleIn>
         </Reveal>
 
         <Reveal delay={120} className="mt-14 grid gap-10 md:grid-cols-[1fr_auto] md:items-end">

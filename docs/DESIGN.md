@@ -18,7 +18,10 @@ It should feel calm and deliberate, not like a template.
 5. **Minimum sizes.** Mono labels are 13px or larger, body text 16px or larger.
 6. **Motion has a purpose and plays once.** Nothing bounces, and nothing loops
    except the sound bars while audio plays.
-7. **Accessible.** Contrast ≥ 4.5:1 (axe checks it), focus rings visible,
+7. **Hover and scroll effects never change layout.** Animate transforms,
+   opacity, colour or background position only. `tests/e2e` checks that hovering
+   headings doesn't change any size.
+8. **Accessible.** Contrast ≥ 4.5:1 (axe checks it), focus rings visible,
    reduced motion respected everywhere.
 
 ## Type
@@ -30,9 +33,12 @@ It should feel calm and deliberate, not like a template.
 
 Utilities in `globals.css`:
 
-- `condensed`: width 75, weight 700, tight tracking. Used for headlines.
-- `stretchy`: condensed at rest, widens to 100 on hover (career titles,
-  "Let's talk").
+- `condensed` (utility): width 75, weight 700, tight tracking. Used for headlines.
+- `<StretchText>` (component): widens from width 75 to 100 on hover. An
+  invisible full-width copy reserves the space, so **hovering never reflows
+  the layout**. Use it only for short single-line text (it never wraps).
+  Never animate `font-variation-settings` width on wrapping text: wider glyphs
+  push words onto new lines and shove the page around. An e2e test guards this.
 
 ## Tokens (`@theme` in `src/app/globals.css`)
 
@@ -80,7 +86,13 @@ Better screenshots can be dropped in later without any layout change.
 | Archive         | spring-follow preview, arrow rotates                           | motion springs         |
 | Terminal        | types out once in view                                         | `RagTerminal`          |
 | Dock            | slides up after the hero; active pill slides between links     | CSS + motion `layoutId`|
-| Career / contact| headline widens on hover                                       | `stretchy`             |
+| Hero (scroll)   | lines shear apart in alternating directions and fade           | `HeroHeadline`         |
+| Project titles  | ink in left → right as they scroll up                          | `ScrollFillText`       |
+| Career          | timeline line fills with a glowing head                        | `ScrollProgressLine`   |
+| Stack           | rows drift sideways in alternating directions                  | `DriftRow`             |
+| Contact         | heading grows into place; widens on hover (no reflow)          | `ScaleIn`, `StretchText` |
+| Career titles   | colour shift on hover                                          | CSS                    |
+| Dock            | page-progress hairline along its bottom edge                   | motion `useScroll`     |
 | Page            | inertial smooth scroll                                         | Lenis                  |
 
 ## Sound

@@ -38,7 +38,7 @@ export function ArchiveList({ projects }: { projects: Project[] }) {
           as="li"
           key={project.slug}
           delay={i * 80}
-          className="group relative border-line border-t last:border-b"
+          className="group relative border-line border-t last-of-type:border-b"
         >
           <article
             data-testid={`project-${project.slug}`}

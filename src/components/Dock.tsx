@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "motion/react";
+import { motion, useScroll, useSpring } from "motion/react";
 import { useEffect, useState } from "react";
 import { navItems } from "@/content/site";
 import { useActiveSection } from "@/hooks/useActiveSection";
@@ -28,6 +28,8 @@ function useScrolledPast(fraction: number) {
 export function Dock() {
   const active = useActiveSection(ids);
   const shown = useScrolledPast(0.35);
+  const { scrollYProgress } = useScroll();
+  const progress = useSpring(scrollYProgress, { stiffness: 200, damping: 40 });
 
   return (
     <nav
@@ -35,7 +37,13 @@ export function Dock() {
       data-shown={shown}
       className="group/dock fixed bottom-4 left-1/2 z-50 -translate-x-1/2 transition-[translate,opacity] duration-700 ease-[var(--ease-out-expo)] focus-within:translate-y-0! focus-within:opacity-100! data-[shown=false]:translate-y-[160%] data-[shown=false]:opacity-0 md:bottom-6"
     >
-      <div className="flex items-center gap-0.5 rounded-full border border-line bg-raised/75 p-1.5 shadow-2xl shadow-black/50 backdrop-blur-xl">
+      <div className="relative flex items-center gap-0.5 overflow-hidden rounded-full border border-line bg-raised/75 p-1.5 shadow-2xl shadow-black/50 backdrop-blur-xl">
+        {/* Page progress along the bottom edge. */}
+        <motion.span
+          aria-hidden
+          className="absolute inset-x-6 bottom-0 h-px origin-left bg-accent"
+          style={{ scaleX: progress }}
+        />
         <ul className="flex items-center">
           {navItems.map((item) => {
             const isActive = active === item.href.slice(1);
