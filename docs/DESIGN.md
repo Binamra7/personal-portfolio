@@ -82,17 +82,17 @@ Better screenshots can be dropped in later without any layout change.
 | Hero stats      | count up (3.2s counts *down* to 1.2s)                          | `CountUp` (rAF)        |
 | Section labels  | hairline draws in                                              | `.draw-line` + Reveal  |
 | Blocks          | fade + rise on first view                                      | `Reveal`               |
-| Screenshots     | clip-path open + parallax + colour lens                        | motion `useScroll`     |
-| Archive         | spring-follow preview, arrow rotates                           | motion springs         |
+| Screenshots     | clip-path open + parallax + colour lens                        | `useScrollProgress`    |
+| Archive         | spring-follow preview, arrow rotates                           | rAF pointer follow     |
 | Terminal        | types out once in view                                         | `RagTerminal`          |
-| Dock            | slides up after the hero; active pill slides between links     | CSS + motion `layoutId`|
+| Dock            | slides up after the hero; active pill slides between links     | measured CSS pill      |
 | Hero (scroll)   | lines shear apart in alternating directions and fade           | `HeroHeadline`         |
 | Project titles  | ink in left → right as they scroll up                          | `ScrollFillText`       |
 | Career          | timeline line fills with a glowing head                        | `ScrollProgressLine`   |
 | Stack           | rows drift sideways in alternating directions                  | `DriftRow`             |
 | Contact         | heading grows into place; widens on hover (no reflow)          | `ScaleIn`, `StretchText` |
 | Career titles   | colour shift on hover                                          | CSS                    |
-| Dock            | page-progress hairline along its bottom edge                   | motion `useScroll`     |
+| Dock            | page-progress hairline along its bottom edge                   | `useScrollProgress`    |
 | Page            | inertial smooth scroll                                         | Lenis                  |
 
 ## Sound
@@ -100,6 +100,6 @@ Better screenshots can be dropped in later without any layout change.
 `lib/ambient.ts` synthesises the music live with Web Audio: a detuned
 A/E drone through a slowly breathing low-pass filter, plus random A-minor
 pentatonic chimes every 3–8s through a generated reverb. Master volume is
-0.07. It's off by default and starts only on click (browsers block
-autoplay). It fades in and out, and pauses while the tab is hidden. Toggles
+0.07. It's on by default: it starts on the visitor's first click, tap or key
+press (browsers block autoplay), and a mute is remembered. It fades in and out, and pauses while the tab is hidden. Toggles
 in the top bar and dock share state through `lib/sound-store.ts`.

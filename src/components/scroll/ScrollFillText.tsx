@@ -1,27 +1,18 @@
 "use client";
 
-import { motion, useReducedMotion, useScroll, useTransform } from "motion/react";
 import { type ReactNode, useRef } from "react";
+import { useScrollProgress } from "@/lib/scroll-progress";
 
-/**
- * Text that "inks in" from left to right as it scrolls up the viewport:
- * a two-tone gradient clipped to the glyphs, with its position tied to scroll.
- */
+/** Inks in left to right as it scrolls up the viewport. Styles: `.scroll-fill`. */
 export function ScrollFillText({ children }: { children: ReactNode }) {
   const ref = useRef<HTMLSpanElement>(null);
-  const reduce = useReducedMotion();
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start 95%", "start 40%"] });
-  const backgroundPositionX = useTransform(scrollYProgress, [0, 1], ["100%", "0%"]);
-
-  if (reduce) return <span ref={ref}>{children}</span>;
-
+  useScrollProgress(ref, [
+    ["start", 0.95],
+    ["start", 0.4],
+  ]);
   return (
-    <motion.span
-      ref={ref}
-      style={{ backgroundPositionX }}
-      className="bg-[length:200%_100%] bg-[linear-gradient(90deg,var(--color-fg)_50%,rgb(236_235_228/0.16)_50%)] bg-clip-text text-transparent [-webkit-box-decoration-break:clone] [box-decoration-break:clone]"
-    >
+    <span ref={ref} className="scroll-fill">
       {children}
-    </motion.span>
+    </span>
   );
 }

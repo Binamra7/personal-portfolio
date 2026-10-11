@@ -1,6 +1,7 @@
 import { Career } from "@/components/Career";
 import { Contact } from "@/components/Contact";
 import { Dock } from "@/components/Dock";
+import { Education } from "@/components/Education";
 import { Hero } from "@/components/Hero";
 import { SiteFooter } from "@/components/SiteFooter";
 import { Stack } from "@/components/Stack";
@@ -13,6 +14,7 @@ export default function Home() {
         <Hero />
         <Work />
         <Career />
+        <Education />
         <Stack />
         <Contact />
       </main>

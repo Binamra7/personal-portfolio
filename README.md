@@ -4,10 +4,10 @@ Live at **[binamrakhadka.vercel.app](https://binamrakhadka.vercel.app)**.
 
 A single, dark, typographic page: big statement, work, career, stack, contact.
 It has a variable-font animation, duotone screenshots with a colour lens, and
-an optional generative ambient soundtrack.
+a generative ambient soundtrack.
 
 **Stack:** Next.js 16 (static export) · React 19 · TypeScript 7 · Tailwind CSS v4 ·
-motion · Lenis · Biome · Vitest · Playwright · Vercel
+Lenis · Biome · Vitest · Playwright · Vercel
 
 ## Quick start
 

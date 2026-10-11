@@ -1,4 +1,4 @@
-import { career, education } from "@/content/site";
+import { career } from "@/content/site";
 import { Reveal } from "./Reveal";
 import { SectionLabel } from "./SectionLabel";
 import { ScrollProgressLine } from "./scroll/ScrollProgressLine";
@@ -41,20 +41,6 @@ export function Career() {
             </ul>
           </Reveal>
         ))}
-
-        <Reveal
-          as="li"
-          className="relative grid gap-4 py-10 md:grid-cols-[11rem_1fr_1fr] md:gap-10 md:py-14"
-        >
-          <span className="draw-line absolute inset-x-0 top-0 h-px bg-line" aria-hidden />
-          <p className="font-mono text-[13px] text-faint">{education.period}</p>
-          <div>
-            <h3 className="condensed text-3xl text-muted uppercase md:text-4xl">
-              {education.title}
-            </h3>
-            <p className="mt-2 text-faint text-lg">{education.school}</p>
-          </div>
-        </Reveal>
       </ol>
     </section>
   );

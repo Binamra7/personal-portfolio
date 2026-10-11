@@ -15,15 +15,17 @@ never holds the TypeScript version back.
 ### TypeScript 7
 Next 16.4's build-time type check works with it, and `tsc` is much faster.
 
-### motion + Lenis
-CSS handles load-in and scroll-in. `motion` is used only where CSS can't do
-the job: scroll-linked clip-path/parallax, spring-follow previews and the dock's
-shared-layout pill. Lenis gives inertial scrolling and animated anchor jumps.
-Both are skipped under reduced motion.
+### No animation library
+motion's scroll and spring hooks pulled about 55 KB (gzipped) into the main
+bundle, even in its lazy mode. Every effect here is "scroll position → transform"
+or a simple pointer follow, so `lib/scroll-progress.ts` (~1 KB) plus CSS does
+the same work with no React re-renders. Lenis (~6 KB) stays for inertial
+scrolling.
 
 ### Generated audio instead of a music file
-No licensing, no download, about 3 KB of code, and it never loops audibly.
-Off by default, because surprise audio is hostile and browsers block it anyway.
+No licensing, no download, a ~1 KB lazy chunk, and it never loops audibly.
+On by default at a low volume (owner's choice). It starts on the first
+interaction, because browsers block autoplay, and a mute is remembered.
 
 ### Duotone screenshots
 The screenshots can't be retaken right now and are bright and mismatched.

@@ -1,19 +1,18 @@
 "use client";
 
-import { motion, useReducedMotion, useScroll, useTransform } from "motion/react";
 import { type ReactNode, useRef } from "react";
+import { useScrollProgress } from "@/lib/scroll-progress";
 
-/** Grows from slightly smaller to full size as it scrolls into view. Transform only. */
-export function ScaleIn({ children, from = 0.82 }: { children: ReactNode; from?: number }) {
+/** Grows from 82% to full size as it scrolls into view. */
+export function ScaleIn({ children }: { children: ReactNode }) {
   const ref = useRef<HTMLDivElement>(null);
-  const reduce = useReducedMotion();
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "start 45%"] });
-  const scale = useTransform(scrollYProgress, [0, 1], [from, 1]);
-  const y = useTransform(scrollYProgress, [0, 1], ["25%", "0%"]);
-
+  useScrollProgress(ref, [
+    ["start", 1],
+    ["start", 0.45],
+  ]);
   return (
-    <motion.div ref={ref} style={reduce ? undefined : { scale, y }} className="origin-bottom-left">
+    <div ref={ref} className="scale-in">
       {children}
-    </motion.div>
+    </div>
   );
 }

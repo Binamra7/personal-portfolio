@@ -47,15 +47,26 @@ runtime requests to Google.
 
 ## Images
 
-`next/image` with `unoptimized: true`, because the optimizer needs a server.
-Screenshots are pre-optimized WebP files (`scripts/optimize-images.mjs`).
+There's no image server in a static export, so `next/image` uses a custom
+loader (`lib/image-loader.ts`) that maps each `srcset` width to a
+pre-generated WebP (1200/640/320px, made by `scripts/optimize-images.mjs`).
+Phones download the 640px file.
 Images use `fill` inside fixed-aspect boxes, so layout never shifts.
 
 ## Audio
 
-`AmbientEngine` (`lib/ambient.ts`) builds a Web Audio graph lazily on the first
-click. `sound-store.ts` holds a single engine and exposes it to React through
-`useSyncExternalStore`, so every toggle stays in sync.
+Sound is on by default, but browsers only allow audio after a click, tap or
+key press, so `sound-store.ts` waits ("armed") for the first one. The
+AudioContext is created synchronously inside that gesture; the synth code
+(`lib/ambient.ts`, ~1 KB) is a separate chunk, prefetched when the browser is
+idle. A mute is saved in localStorage. All toggles read the same store via
+`useSyncExternalStore`.
+
+## Scroll-linked animation
+
+`lib/scroll-progress.ts` runs one rAF loop for every registered element: one
+pass of `getBoundingClientRect` reads, then one pass of CSS-variable writes.
+No React state changes while scrolling.
 
 ## Metadata
 

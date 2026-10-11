@@ -1,22 +1,28 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
+import { useEffect, useSyncExternalStore } from "react";
 import { soundStore } from "@/lib/sound-store";
 
 /**
- * Toggles the generative ambient soundtrack. Off by default: browsers block
- * autoplay, and nobody likes surprise audio. `withLabel` adds visible text.
+ * Toggles the generative ambient soundtrack. On by default ("armed" until the
+ * first interaction, since browsers block autoplay). `withLabel` adds text.
  */
 export function SoundToggle({ withLabel = false }: { withLabel?: boolean }) {
-  const on = useSyncExternalStore(
+  const state = useSyncExternalStore(
     soundStore.subscribe,
     soundStore.getSnapshot,
     soundStore.getServerSnapshot,
   );
+  useEffect(() => soundStore.init(), []);
+
+  const on = state !== "off";
+  const playing = state === "playing";
 
   return (
     <button
       type="button"
+      data-sound-toggle
+      data-state={state}
       onClick={soundStore.toggle}
       aria-pressed={on}
       aria-label={on ? "Mute ambient sound" : "Play ambient sound"}
@@ -25,12 +31,12 @@ export function SoundToggle({ withLabel = false }: { withLabel?: boolean }) {
         withLabel ? "px-3" : "w-10"
       }`}
     >
-      <span className="flex h-3.5 items-end gap-[3px]" aria-hidden>
+      <span className={`flex h-3.5 items-end gap-[3px] ${on ? "text-accent" : ""}`} aria-hidden>
         {[0, 1, 2, 3].map((i) => (
           <span
             key={i}
             className={`h-full w-[2px] origin-bottom rounded-full bg-current transition-transform duration-500 ${
-              on ? "animate-eq text-accent" : "scale-y-[0.3]"
+              playing ? "animate-eq" : on ? "scale-y-[0.55]" : "scale-y-[0.3]"
             }`}
             style={{ animationDelay: `${i * -0.27}s` }}
           />

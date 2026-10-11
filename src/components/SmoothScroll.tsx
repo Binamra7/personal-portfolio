@@ -2,6 +2,7 @@
 
 import Lenis from "lenis";
 import { useEffect } from "react";
+import { prefersReducedMotion } from "@/lib/scroll-progress";
 
 /**
  * Inertial smooth scrolling via Lenis. Also animates in-page anchor links.
@@ -9,7 +10,7 @@ import { useEffect } from "react";
  */
 export function SmoothScroll() {
   useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (prefersReducedMotion()) return;
 
     const lenis = new Lenis({
       autoRaf: true,

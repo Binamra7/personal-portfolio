@@ -15,14 +15,14 @@ export function Contact() {
     >
       <div
         aria-hidden
-        className="pointer-events-none absolute bottom-0 left-1/2 size-[70rem] -translate-x-1/2 translate-y-1/2 rounded-full opacity-70 blur-3xl"
+        className="pointer-events-none absolute bottom-0 left-1/2 size-[70rem] -translate-x-1/2 translate-y-1/2 rounded-full opacity-70"
         style={{
           background: "radial-gradient(closest-side, rgb(244 167 59 / 0.12), transparent)",
         }}
       />
 
       <div className="relative mx-auto max-w-7xl px-5 md:px-10">
-        <SectionLabel index="04" label="Contact" aside={`${profile.city}, ${profile.country}`} />
+        <SectionLabel index="05" label="Contact" aside={`${profile.city}, ${profile.country}`} />
 
         <Reveal>
           <ScaleIn>

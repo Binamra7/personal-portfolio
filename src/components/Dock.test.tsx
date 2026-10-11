@@ -13,13 +13,12 @@ describe("<Dock />", () => {
     }
   });
 
-  it("has a sound toggle that is off by default", async () => {
+  it("falls back to sound off where Web Audio is unavailable", async () => {
     const user = userEvent.setup();
     render(<Dock />);
-    const button = screen.getByRole("button", { name: /play ambient sound/i });
+    // jsdom has no AudioContext: the default "on" must degrade to off, and stay off.
+    const button = await screen.findByRole("button", { name: /play ambient sound/i });
     expect(button).toHaveAttribute("aria-pressed", "false");
-
-    // jsdom has no AudioContext, so the toggle must stay safely off.
     await user.click(button);
     expect(button).toHaveAttribute("aria-pressed", "false");
   });

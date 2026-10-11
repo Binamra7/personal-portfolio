@@ -1,35 +1,53 @@
 "use client";
 
-import { AnimatePresence, motion, useMotionValue, useSpring } from "motion/react";
 import Image from "next/image";
-import { type PointerEvent, useState } from "react";
+import { type PointerEvent, useEffect, useRef, useState } from "react";
 import type { Project } from "@/content/site";
 import { ArrowUpRight, GitHubIcon } from "./icons";
 import { Reveal } from "./Reveal";
 
-/**
- * Older projects as big typographic rows. On desktop, hovering a row shows a
- * small screenshot preview that trails the cursor on a spring.
- */
-export function ArchiveList({ projects }: { projects: Project[] }) {
-  const [active, setActive] = useState<number | null>(null);
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
-  const springX = useSpring(x, { stiffness: 260, damping: 28, mass: 0.6 });
-  const springY = useSpring(y, { stiffness: 260, damping: 28, mass: 0.6 });
+/** Eases an element towards the pointer each frame, then goes idle. */
+function useFollowPointer() {
+  const ref = useRef<HTMLDivElement>(null);
+  const target = useRef({ x: 0, y: 0 });
+  const pos = useRef<{ x: number; y: number } | null>(null);
+  const frame = useRef(0);
 
-  function track(event: PointerEvent<HTMLUListElement>) {
-    const rect = event.currentTarget.getBoundingClientRect();
-    x.set(event.clientX - rect.left);
-    y.set(event.clientY - rect.top);
+  useEffect(() => () => cancelAnimationFrame(frame.current), []);
+
+  function tick() {
+    const p = pos.current;
+    const t = target.current;
+    if (!p || !ref.current) return;
+    p.x += (t.x - p.x) * 0.2;
+    p.y += (t.y - p.y) * 0.2;
+    ref.current.style.transform = `translate3d(${p.x}px, ${p.y}px, 0)`;
+    frame.current =
+      Math.abs(t.x - p.x) + Math.abs(t.y - p.y) > 0.5 ? requestAnimationFrame(tick) : 0;
   }
 
-  const activeProject = active === null ? null : projects[active];
+  function track(event: PointerEvent<HTMLElement>) {
+    const rect = event.currentTarget.getBoundingClientRect();
+    target.current = { x: event.clientX - rect.left, y: event.clientY - rect.top };
+    pos.current ??= { ...target.current }; // first move: appear under the cursor, don't fly in
+    if (!frame.current) frame.current = requestAnimationFrame(tick);
+  }
+
+  return { ref, track };
+}
+
+/**
+ * Older projects as big typographic rows. On desktop, hovering a row shows a
+ * screenshot preview that trails the cursor.
+ */
+export function ArchiveList({ projects }: { projects: Project[] }) {
+  const [active, setActive] = useState<string | null>(null);
+  const follow = useFollowPointer();
 
   return (
     <ul
       className="relative"
-      onPointerMove={track}
+      onPointerMove={follow.track}
       onPointerLeave={() => setActive(null)}
       aria-label="Earlier projects"
     >
@@ -42,12 +60,9 @@ export function ArchiveList({ projects }: { projects: Project[] }) {
         >
           <article
             data-testid={`project-${project.slug}`}
-            onPointerEnter={() => setActive(i)}
+            onPointerEnter={() => setActive(project.slug)}
             className="flex items-center gap-5 py-6 md:gap-8 md:py-8"
           >
-            <span className="w-11 shrink-0 font-mono text-[13px] text-faint md:w-16">
-              {project.year}
-            </span>
             <div className="min-w-0 flex-1">
               <h3 className="condensed text-4xl uppercase transition-colors group-hover:text-accent md:text-6xl">
                 <a
@@ -86,43 +101,32 @@ export function ArchiveList({ projects }: { projects: Project[] }) {
         </Reveal>
       ))}
 
-      <AnimatePresence>
-        {activeProject?.image && (
-          <motion.div
-            key="preview"
-            aria-hidden
-            className="pointer-events-none absolute top-0 left-0 z-20 hidden w-80 [@media(hover:hover)]:md:block"
-            style={{
-              x: springX,
-              y: springY,
-              translateX: "-50%",
-              translateY: "-115%",
-            }}
-            initial={{ opacity: 0, scale: 0.85, rotate: -4 }}
-            animate={{ opacity: 1, scale: 1, rotate: -2 }}
-            exit={{ opacity: 0, scale: 0.85, rotate: 2 }}
-            transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-          >
-            <div className="relative aspect-video overflow-hidden rounded-lg shadow-2xl shadow-black/60 ring-1 ring-line-strong">
-              {projects.map(
-                (p) =>
-                  p.image && (
-                    <Image
-                      key={p.slug}
-                      src={p.image.src}
-                      alt=""
-                      fill
-                      sizes="320px"
-                      className={`object-cover object-top transition-opacity duration-300 ${
-                        p.slug === activeProject.slug ? "opacity-100" : "opacity-0"
-                      }`}
-                    />
-                  ),
-              )}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <div
+        ref={follow.ref}
+        aria-hidden
+        className="pointer-events-none absolute top-0 left-0 z-20 hidden [@media(hover:hover)]:md:block"
+      >
+        <div
+          data-active={active !== null}
+          className="relative aspect-video w-80 -translate-x-1/2 -translate-y-[115%] -rotate-4 scale-85 overflow-hidden rounded-lg opacity-0 shadow-2xl shadow-black/60 ring-1 ring-line-strong transition-[opacity,scale,rotate] duration-300 ease-[var(--ease-out-expo)] data-[active=true]:-rotate-2 data-[active=true]:scale-100 data-[active=true]:opacity-100"
+        >
+          {projects.map(
+            (p) =>
+              p.image && (
+                <Image
+                  key={p.slug}
+                  src={p.image.src}
+                  alt=""
+                  fill
+                  sizes="320px"
+                  className={`object-cover object-top transition-opacity duration-300 ${
+                    p.slug === active ? "opacity-100" : "opacity-0"
+                  }`}
+                />
+              ),
+          )}
+        </div>
+      </div>
     </ul>
   );
 }

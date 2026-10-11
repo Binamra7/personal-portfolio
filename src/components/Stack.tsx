@@ -14,7 +14,7 @@ export function Stack() {
       id="stack"
       className="mx-auto max-w-7xl overflow-x-clip px-5 py-28 md:px-10 md:py-40"
     >
-      <SectionLabel index="03" label="Stack" aside="Daily drivers" />
+      <SectionLabel index="04" label="Stack" aside="Daily drivers" />
 
       <div className="group/stack space-y-6 md:space-y-4">
         {toolkit.map((group, i) => (
@@ -29,7 +29,7 @@ export function Stack() {
               >
                 {group.label}
               </span>
-              <DriftRow direction={i % 2 === 0 ? 1 : -1} distance={3}>
+              <DriftRow distance={i % 2 === 0 ? 3 : -3}>
                 <p className="condensed flex flex-wrap gap-x-5 text-[clamp(2.4rem,5.6vw,5.25rem)] uppercase leading-[1.02] md:gap-x-7">
                   {group.items.map((item) => (
                     <span

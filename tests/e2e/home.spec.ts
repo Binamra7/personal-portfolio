@@ -80,16 +80,27 @@ test.describe("navigation", () => {
     );
   });
 
-  test("sound toggle flips its pressed state", async ({ page }) => {
+  test("sound is on by default, starts on first interaction, and remembers a mute", async ({
+    page,
+  }) => {
     await page.goto("/");
+    const toggles = page.locator("[data-sound-toggle]");
+    await expect(toggles).toHaveCount(2);
+    await expect(toggles.first()).toHaveAttribute("data-state", "armed");
+
+    // Browsers only allow audio after a gesture: the first click starts it.
+    await page.locator("h1").click();
+    await expect(toggles.first()).toHaveAttribute("data-state", "playing");
+
     await page
-      .getByRole("button", { name: /play ambient sound/i })
+      .getByRole("button", { name: /mute ambient sound/i })
       .first()
       .click();
-    // Both toggles (top bar + dock) share one state.
-    const muted = page.getByRole("button", { name: /mute ambient sound/i });
-    await expect(muted).toHaveCount(2);
-    await expect(muted.first()).toHaveAttribute("aria-pressed", "true");
+    await expect(toggles.nth(0)).toHaveAttribute("data-state", "off");
+    await expect(toggles.nth(1)).toHaveAttribute("data-state", "off");
+
+    await page.reload();
+    await expect(page.locator("[data-sound-toggle]").first()).toHaveAttribute("data-state", "off");
   });
 });
 

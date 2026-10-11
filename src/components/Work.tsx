@@ -16,7 +16,7 @@ function FeaturedProject({ project, index }: { project: Project; index: number }
     >
       <Reveal className="mb-4 flex items-end justify-between gap-6 font-mono text-[13px] text-muted">
         <span>
-          <span className="text-accent">{String(index + 1).padStart(2, "0")}</span> / {project.year}
+          <span className="text-accent">{String(index + 1).padStart(2, "0")}</span>
         </span>
         <span className="hidden text-right sm:block">{project.stack.join(" · ")}</span>
       </Reveal>
@@ -58,7 +58,11 @@ export function Work() {
       ))}
 
       <div className="mt-32 md:mt-44">
-        <SectionLabel index="01.b" label="Earlier work" aside="2021 — 2022" />
+        <SectionLabel
+          index="01.b"
+          label="Earlier work"
+          aside={`${archiveProjects.length} projects`}
+        />
         <ArchiveList projects={archiveProjects} />
       </div>
     </section>

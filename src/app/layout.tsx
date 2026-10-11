@@ -6,16 +6,19 @@ import { getSiteUrl } from "@/lib/site-url";
 import "./globals.css";
 
 // Fonts are downloaded at build time and self-hosted: no runtime request to Google.
-// Bricolage is variable in weight + width; the design animates the width axis.
+// Bricolage is variable in weight + width (the design animates both). The
+// optical-size axis isn't used, so it's left out to shrink the font file.
 const display = Bricolage_Grotesque({
   subsets: ["latin"],
-  axes: ["wdth", "opsz"],
+  axes: ["wdth"],
   variable: "--font-bricolage",
   display: "swap",
 });
 
+// One static weight: labels never change weight.
 const mono = Martian_Mono({
   subsets: ["latin"],
+  weight: "400",
   variable: "--font-martian",
   display: "swap",
 });

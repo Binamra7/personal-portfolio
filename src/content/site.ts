@@ -37,7 +37,6 @@ export type Project = {
   image?: { src: string; alt: string };
   /** Built-in illustration for projects without a screenshot. */
   visual?: "rag-terminal";
-  year: string;
 };
 
 export type Role = {
@@ -99,12 +98,14 @@ export const socials: SocialLink[] = [
   },
 ];
 
-export const navItems = [
+export const navItems: { label: string; href: string; desktopOnly?: boolean }[] = [
   { label: "Work", href: "#work" },
   { label: "Career", href: "#career" },
+  // Hidden in the dock on small screens to keep it on one line.
+  { label: "Education", href: "#education", desktopOnly: true },
   { label: "Stack", href: "#stack" },
   { label: "Contact", href: "#contact" },
-] as const;
+];
 
 /** Shown large, one after another. */
 export const featuredProjects: Project[] = [
@@ -119,7 +120,6 @@ export const featuredProjects: Project[] = [
       src: "/projects/sleekstore.webp",
       alt: "SleekStore product listing with search, sort and category filters",
     },
-    year: "2022",
   },
   {
     slug: "rag-assistant",
@@ -127,7 +127,6 @@ export const featuredProjects: Project[] = [
     summary: "Ask questions of 10,000+ note chunks. Every answer cites its source.",
     stack: ["Python", "MCP", "LangChain", "Vector DB"],
     visual: "rag-terminal",
-    year: "2025",
   },
 ];
 
@@ -144,7 +143,6 @@ export const archiveProjects: Project[] = [
       src: "/projects/bug-reporter.webp",
       alt: "Bug Reporter dashboard listing active bugs by severity",
     },
-    year: "2022",
   },
   {
     slug: "filmstop",
@@ -157,7 +155,6 @@ export const archiveProjects: Project[] = [
       src: "/projects/filmstop.webp",
       alt: "FilmStop page showing the audience's highest rated movie",
     },
-    year: "2021",
   },
   {
     slug: "weather-app",
@@ -170,7 +167,6 @@ export const archiveProjects: Project[] = [
       src: "/projects/weather-app.webp",
       alt: "Weather App showing 69°F and clouds",
     },
-    year: "2021",
   },
 ];
 
@@ -209,11 +205,25 @@ export const career: Role[] = [
   },
 ];
 
-export const education = {
-  period: "2021 — 2025",
-  title: "B.Sc. CSIT",
-  school: "Trinity College, Tribhuvan University",
+export type Education = {
+  period: string;
+  degree: string;
+  field: string;
+  school: string;
+  university: string;
+  place: string;
 };
+
+export const education: Education[] = [
+  {
+    period: "2021 — 2025",
+    degree: "B.Sc. CSIT",
+    field: "Computer Science & Information Technology",
+    school: "Trinity College",
+    university: "Tribhuvan University",
+    place: "Kathmandu",
+  },
+];
 
 export const toolkit: ToolGroup[] = [
   { label: "Languages", items: ["TypeScript", "Ruby", "Python", "SQL"] },

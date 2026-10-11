@@ -2,6 +2,7 @@
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { Stat } from "@/content/site";
+import { prefersReducedMotion } from "@/lib/scroll-progress";
 
 // useLayoutEffect warns during server rendering; fall back to useEffect there.
 const useIsoLayoutEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
@@ -25,7 +26,7 @@ export function CountUp({ from = 0, to, decimals = 0, prefix = "", suffix = "" }
   useIsoLayoutEffect(() => {
     const node = ref.current;
     if (!node || typeof IntersectionObserver === "undefined") return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (prefersReducedMotion()) return;
 
     setValue(from);
     let frame = 0;

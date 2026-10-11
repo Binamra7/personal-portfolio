@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { prefersReducedMotion } from "@/lib/scroll-progress";
 
 /** A short scripted session for the RAG assistant project (illustrative). */
 export const TERMINAL_SCRIPT = [
@@ -29,7 +30,7 @@ export function RagTerminal() {
   useEffect(() => {
     const node = ref.current;
     if (!node || typeof IntersectionObserver === "undefined") return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (prefersReducedMotion()) return;
 
     let timer: ReturnType<typeof setInterval> | undefined;
     setTyped(0);

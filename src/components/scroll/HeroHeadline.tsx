@@ -1,42 +1,45 @@
 "use client";
 
-import { motion, useReducedMotion, useScroll, useTransform } from "motion/react";
-import type { CSSProperties } from "react";
+import { type CSSProperties, useRef } from "react";
+import { useScrollProgress } from "@/lib/scroll-progress";
 
 type Line = { text: string; accent?: boolean };
 
-/** Alternating directions, so the lines shear apart as the hero scrolls away. */
 const DRIFT = ["-14%", "10%", "-6%"];
 
-function DriftLine({ line, index }: { line: Line; index: number }) {
-  const reduce = useReducedMotion();
-  const { scrollY } = useScroll();
-  const x = useTransform(scrollY, [0, 700], ["0%", DRIFT[index % DRIFT.length] ?? "0%"]);
-  const opacity = useTransform(scrollY, [0, 650], [1, 0.12]);
-
-  return (
-    <motion.span
-      style={reduce ? undefined : { x, opacity }}
-      className="block overflow-hidden whitespace-nowrap pt-[0.04em]"
-    >
-      {/* Load-in animation is CSS (`settle`) so it starts before hydration. */}
-      <span
-        className={`block animate-settle ${line.accent ? "text-accent" : ""}`}
-        style={{ animationDelay: `${150 + index * 120}ms` } as CSSProperties}
-      >
-        {line.text}
-      </span>
-    </motion.span>
-  );
-}
-
-/** The giant hero statement: settles in on load, shears apart on scroll. */
+/** Settles in on load (CSS), then shears apart as the hero scrolls away. */
 export function HeroHeadline({ lines, srPrefix }: { lines: Line[]; srPrefix: string }) {
+  const ref = useRef<HTMLHeadingElement>(null);
+  useScrollProgress(
+    ref,
+    [
+      ["start", 0],
+      ["start", -0.8],
+    ],
+    {
+      target: (el) => el.closest("section") ?? el,
+    },
+  );
+
   return (
-    <h1 className="condensed text-[clamp(3.4rem,13.5vw,13.5rem)] uppercase leading-[0.84]">
+    <h1
+      ref={ref}
+      className="condensed text-[clamp(3.4rem,13.5vw,13.5rem)] uppercase leading-[0.84]"
+    >
       <span className="sr-only">{srPrefix}</span>
       {lines.map((line, i) => (
-        <DriftLine key={line.text} line={line} index={i} />
+        <span
+          key={line.text}
+          className="hero-line block overflow-hidden whitespace-nowrap pt-[0.04em]"
+          style={{ "--drift": DRIFT[i % DRIFT.length] } as CSSProperties}
+        >
+          <span
+            className={`block animate-settle ${line.accent ? "text-accent" : ""}`}
+            style={{ animationDelay: `${150 + i * 120}ms` }}
+          >
+            {line.text}
+          </span>
+        </span>
       ))}
     </h1>
   );

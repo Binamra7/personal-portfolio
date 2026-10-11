@@ -32,6 +32,17 @@ describe("site content", () => {
     }
   });
 
+  it.each(allProjects.filter((p) => p.image))(
+    "$title has every responsive size the image loader asks for",
+    (project) => {
+      for (const width of [640, 320]) {
+        expect(publicFile(project.image?.src.replace(/\.webp$/, `-${width}.webp`) ?? "")).toBe(
+          true,
+        );
+      }
+    },
+  );
+
   it("gives every archive project a screenshot for the hover preview", () => {
     for (const project of archiveProjects) expect(project.image).toBeDefined();
   });
@@ -68,7 +79,13 @@ describe("site content", () => {
   });
 
   it("links nav items to the page's sections", () => {
-    expect(navItems.map((n) => n.href)).toEqual(["#work", "#career", "#stack", "#contact"]);
+    expect(navItems.map((n) => n.href)).toEqual([
+      "#work",
+      "#career",
+      "#education",
+      "#stack",
+      "#contact",
+    ]);
   });
 
   it("has a valid email, time zone and no empty tool groups", () => {

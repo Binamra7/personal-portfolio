@@ -16,7 +16,7 @@ export function Hero() {
       {/* Warm glow behind the headline. Static on purpose. */}
       <div
         aria-hidden
-        className="pointer-events-none absolute top-0 right-0 size-[60rem] translate-x-1/3 -translate-y-1/3 rounded-full opacity-70 blur-3xl"
+        className="pointer-events-none absolute top-0 right-0 size-[60rem] translate-x-1/3 -translate-y-1/3 rounded-full opacity-70"
         style={{
           background: "radial-gradient(closest-side, rgb(244 167 59 / 0.12), transparent)",
         }}

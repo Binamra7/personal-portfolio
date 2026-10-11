@@ -12,7 +12,7 @@ Everything is in **`src/content/site.ts`**. Facts should match the résumé in
 | Big project showcases      | `featuredProjects` |
 | Older projects list        | `archiveProjects`  |
 | Jobs                       | `career` (≤ 3 highlights, ≤ 70 chars each) |
-| Degree                     | `education`        |
+| Degrees                    | `education` (own section, same layout as career) |
 | Tools                      | `toolkit`          |
 | Social links               | `socials` (`github` / `linkedin`; add icons in `components/icons.tsx`) |
 | Dock links                 | `navItems` (must match section ids) |
@@ -22,6 +22,7 @@ Everything is in **`src/content/site.ts`**. Facts should match the résumé in
 1. Screenshot the app, ideally 16:9 and ≥ 1200px wide. The top of the image is
    kept when cropping.
 2. `npm run images -- ~/Downloads/shot.png my-app` → `public/projects/my-app.webp`
+   plus `-640`/`-320` variants (a content test checks they exist)
 3. Add the entry:
    ```ts
    {
@@ -32,7 +33,6 @@ Everything is in **`src/content/site.ts`**. Facts should match the résumé in
      sourceUrl: "https://github.com/binamra7/my-app", // omit if private
      liveUrl: "https://my-app.vercel.app",            // optional
      image: { src: "/projects/my-app.webp", alt: "What the screenshot shows" },
-     year: "2026",
    }
    ```
    Put it in `featuredProjects` (large, with the duotone lens) or

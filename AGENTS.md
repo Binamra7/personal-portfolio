@@ -7,7 +7,7 @@ Guide for AI coding agents (and humans) working in this repo. Read this first.
 
 Binamra Khadka's portfolio: one static page (hero, work, career, stack,
 contact). Next.js 16 App Router with `output: "export"`, React 19,
-TypeScript 7, Tailwind CSS v4, motion + Lenis for animation, Biome for
+TypeScript 7, Tailwind CSS v4, Lenis for smooth scroll, Biome for
 lint/format. Hosted on Vercel at https://binamrakhadka.vercel.app.
 
 ## ⚠️ Production guardrails
@@ -50,7 +50,7 @@ src/
     globals.css        tokens (@theme), keyframes, duotone, reveal, `condensed`
     opengraph-image.png, icon.svg, sitemap.ts, robots.ts, not-found.tsx
   components/
-    Hero, Work, Career, Stack, Contact, SiteFooter     sections (server)
+    Hero, Work, Career, Education, Stack, Contact, SiteFooter   sections (server)
     TopBar, Dock, SoundToggle, LocalClock               page chrome
     LensImage      duotone screenshot + scroll reveal + colour lens (client)
     ArchiveList    big-type rows + cursor-following preview (client)
@@ -63,8 +63,10 @@ src/
     SmoothScroll   Lenis (client)
     icons.tsx      inline SVG icons
   hooks/useActiveSection.ts
-  lib/ambient.ts       generative Web Audio soundtrack
-  lib/sound-store.ts   shared on/off state for all sound toggles
+  lib/ambient.ts       generative Web Audio soundtrack (lazy chunk)
+  lib/sound-store.ts   sound state: on by default, starts on first interaction
+  lib/scroll-progress.ts  shared scroll loop → CSS `--p`
+  lib/image-loader.ts  next/image loader for pre-generated widths
   lib/site-url.ts
 public/projects/       WebP screenshots (≤1200px)
 scripts/               serve-static, optimize-images, render-og
@@ -75,16 +77,19 @@ docs/                  see below
 ## Conventions
 
 - Server components by default. Use `"use client"` only for state, effects or
-  motion, and keep those components small and leaf-level.
+  animation, and keep those components small and leaf-level.
 - Style with Tailwind utilities and theme tokens (`bg-bg`, `text-muted`,
   `text-accent`, `border-line`, `condensed`). No hard-coded hex in
   components. New tokens go in `@theme` and in `docs/DESIGN.md`.
 - Copy is short. Unit tests enforce lengths for summaries, highlights, hero
   lines and stat labels.
-- Motion: CSS keyframes for load-in, `<Reveal>` for scroll-in, `motion` only
-  for scroll-linked or spring/layout effects. Everything must respect
-  `prefers-reduced-motion` (CSS handles it globally; motion components check
-  `useReducedMotion`).
+- Motion: CSS keyframes for load-in, `<Reveal>` for scroll-in, and
+  `useScrollProgress` (`lib/scroll-progress.ts`) for scroll-linked effects.
+  The hook writes a 0→1 `--p` variable; CSS in `globals.css` maps it to
+  transforms, with the finished state as the `var()` fallback. No animation
+  library: don't add one for something CSS plus `--p` can do.
+- Images: run `npm run images` so the 640/320 variants exist; the custom loader
+  (`lib/image-loader.ts`) serves them through `srcset`.
 - **Hover/scroll effects must not change layout.** Animate transforms,
   opacity, colour or background position. To widen text on hover, use
   `<StretchText>`. An e2e test fails if hovering resizes anything.
