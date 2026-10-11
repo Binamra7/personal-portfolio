@@ -14,7 +14,7 @@ permissions:
 
 jobs:
   check:
-    name: Lint, typecheck, unit tests
+    name: Lint, format, typecheck, unit tests
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -24,8 +24,8 @@ jobs:
           node-version-file: .nvmrc
           cache: npm
       - run: npm ci
-      - run: npm run format:check
-      - run: npm run lint
+      - name: Lint + format (Biome)
+        run: npx biome ci .
       - run: npm run typecheck
       - run: npm run test:coverage
       - name: Audit production dependencies

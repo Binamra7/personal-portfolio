@@ -1,6 +1,6 @@
 ---
 description: Add a new project to the portfolio from a screenshot and repo URL
-argument-hint: <screenshot-path> <github-url> [live-url]
+argument-hint: <screenshot-path> <github-url> [live-url] [featured|archive]
 ---
 
 Add a project to the portfolio. Arguments: $ARGUMENTS
@@ -10,9 +10,8 @@ Add a project to the portfolio. Arguments: $ARGUMENTS
    `npm run images -- <screenshot-path> <slug>`.
 3. Look at the screenshot and repo README (if reachable) to write:
    - `summary`: one sentence, ≤ 90 chars, plain words
-   - `imageAlt`: what the screenshot shows
-   - `stack`: 2–5 main technologies
-4. Append the entry to `projects` in `src/content/site.ts` (ask if it should
-   go somewhere other than the end).
+   - `image.alt`: what the screenshot shows
+   - `stack`: 2–5 main technologies; `year`
+4. Add it to `featuredProjects` or `archiveProjects` (default: archive; ask if unsure).
 5. Run `npm run check`, then `npm run build && npm run test:e2e`.
 6. Show the diff. Do not commit to or push `main`.

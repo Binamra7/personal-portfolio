@@ -30,10 +30,7 @@ const types = {
 };
 
 async function resolveFile(urlPath) {
-  const safe = normalize(decodeURIComponent(urlPath)).replace(
-    /^(\.\.[/\\])+/,
-    "",
-  );
+  const safe = normalize(decodeURIComponent(urlPath)).replace(/^(\.\.[/\\])+/, "");
   const base = join(root, safe);
   if (!base.startsWith(root)) return null;
 

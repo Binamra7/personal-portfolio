@@ -2,62 +2,56 @@ import { profile, socials } from "@/content/site";
 import { CopyEmailButton } from "./CopyEmailButton";
 import { ArrowUpRight, socialIcons } from "./icons";
 import { Reveal } from "./Reveal";
+import { SectionLabel } from "./SectionLabel";
 
 export function Contact() {
   return (
     <section
       aria-labelledby="contact-title"
       id="contact"
-      className="relative overflow-hidden border-t border-line"
+      className="relative overflow-x-clip pt-28 pb-16 md:pt-40"
     >
       <div
         aria-hidden
-        className="pointer-events-none absolute -right-1/4 -bottom-1/2 size-[60rem] rounded-full opacity-60 blur-3xl"
+        className="pointer-events-none absolute bottom-0 left-1/2 size-[70rem] -translate-x-1/2 translate-y-1/2 rounded-full opacity-70 blur-3xl"
         style={{
-          background:
-            "radial-gradient(closest-side, rgb(242 165 65 / 0.10), transparent)",
+          background: "radial-gradient(closest-side, rgb(244 167 59 / 0.12), transparent)",
         }}
       />
 
-      <div className="relative mx-auto max-w-6xl px-5 py-24 md:px-8 md:py-40">
+      <div className="relative mx-auto max-w-7xl px-5 md:px-10">
+        <SectionLabel index="04" label="Contact" aside={`${profile.city}, ${profile.country}`} />
+
         <Reveal>
-          <p className="mb-4 font-mono text-xs tracking-widest text-faint uppercase">
-            <span className="text-accent">04</span> — Contact
-          </p>
           <h2
             id="contact-title"
-            className="text-[clamp(2.5rem,8vw,6rem)] leading-[0.95] font-medium tracking-[-0.04em]"
+            className="stretchy font-bold text-[clamp(4.5rem,21vw,20rem)] uppercase leading-[0.8]"
           >
-            Let&rsquo;s build
-            <br />
-            <span className="text-muted">something.</span>
+            Let&rsquo;s talk<span className="text-accent">.</span>
           </h2>
         </Reveal>
 
-        <Reveal delay={120} className="mt-12">
-          <a
-            href={`mailto:${profile.email}`}
-            className="group inline-flex items-center gap-3 text-xl tracking-tight break-all transition-colors hover:text-accent md:text-3xl"
-          >
-            {profile.email}
-            <ArrowUpRight className="size-6 shrink-0 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
-          </a>
-          <div className="mt-6 flex flex-wrap items-center gap-3">
-            <CopyEmailButton email={profile.email} />
+        <Reveal delay={120} className="mt-14 grid gap-10 md:grid-cols-[1fr_auto] md:items-end">
+          <div>
             <a
-              href={profile.phone.href}
-              className="px-2 py-2 text-sm text-muted transition-colors hover:text-fg"
+              href={`mailto:${profile.email}`}
+              className="group inline-flex items-center gap-3 break-all text-2xl transition-colors hover:text-accent md:text-4xl"
             >
-              {profile.phone.display}
+              {profile.email}
+              <ArrowUpRight className="size-7 shrink-0 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
             </a>
+            <div className="mt-6 flex flex-wrap items-center gap-3">
+              <CopyEmailButton email={profile.email} />
+              <a
+                href={profile.phone.href}
+                className="px-2 py-2 font-mono text-[13px] text-muted transition-colors hover:text-fg"
+              >
+                {profile.phone.display}
+              </a>
+            </div>
           </div>
-        </Reveal>
 
-        <Reveal delay={200} className="mt-16">
-          <ul
-            className="flex flex-wrap gap-x-8 gap-y-3"
-            aria-label="Social links"
-          >
+          <ul className="flex flex-wrap gap-x-8 gap-y-3" aria-label="Elsewhere">
             {socials.map(({ label, href, icon }) => {
               const Icon = socialIcons[icon];
               return (
@@ -66,14 +60,26 @@ export function Contact() {
                     href={href}
                     target="_blank"
                     rel="noreferrer"
-                    className="inline-flex items-center gap-2 text-sm text-muted transition-colors hover:text-fg"
+                    className="inline-flex items-center gap-2 text-lg text-muted transition-colors hover:text-fg"
                   >
-                    <Icon className="size-4" />
+                    <Icon className="size-5" />
                     {label}
                   </a>
                 </li>
               );
             })}
+            {profile.resumeUrl && (
+              <li>
+                <a
+                  href={profile.resumeUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 text-lg text-muted transition-colors hover:text-fg"
+                >
+                  Résumé <ArrowUpRight className="size-4" />
+                </a>
+              </li>
+            )}
           </ul>
         </Reveal>
       </div>

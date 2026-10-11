@@ -5,33 +5,37 @@ Guide for AI coding agents (and humans) working in this repo. Read this first.
 
 ## What this is
 
-Binamra Khadka's personal portfolio: one static page (hero, work, about,
-skills, contact). Next.js App Router with `output: "export"`, React 19,
-TypeScript, Tailwind CSS v4. Hosted on Vercel.
+Binamra Khadka's portfolio: one static page (hero, work, career, stack,
+contact). Next.js 16 App Router with `output: "export"`, React 19,
+TypeScript 7, Tailwind CSS v4, motion + Lenis for animation, Biome for
+lint/format. Hosted on Vercel at https://binamrakhadka.vercel.app.
 
 ## ⚠️ Production guardrails
 
-- **`main` is production.** Every push/merge to `main` deploys live via
+- **`main` is production.** Every push or merge to `main` deploys live via
   Vercel's Git integration. Never push or merge to `main` without the owner's
   explicit go-ahead. Work on a branch; Vercel builds a preview URL for it.
-- Run `npm run check` and `npm run build && npm run test:e2e` before calling
-  work done. CI runs the same on every PR.
-- Don't add a server-only feature (API routes, middleware, ISR, `next/image`
-  optimization, `headers()`/`cookies()`). The site is a static export and
+- Before calling work done, run `npm run check` and
+  `npm run build && npm run test:e2e`. CI runs the same.
+- Don't add server-only features (API routes, middleware, ISR, `next/image`
+  optimization, `headers()`/`cookies()`). The site is a static export, and
   `next build` will fail.
+- Facts about the owner come from the résumé (`public/binamra-khadka-resume.pdf`).
+  Don't invent roles, numbers or availability claims.
 
 ## Commands
 
-| Task                        | Command                               |
-| --------------------------- | ------------------------------------- |
-| Dev server (localhost:3000) | `npm run dev`                         |
-| Production build → `out/`   | `npm run build`                       |
-| Serve the built `out/`      | `npm start`                           |
-| Everything except e2e       | `npm run check`                       |
-| Unit tests / watch          | `npm test` / `npm run test:watch`     |
-| E2E + a11y (needs a build)  | `npm run build && npm run test:e2e`   |
-| Fix formatting / lint       | `npm run format` / `npm run lint:fix` |
-| Add a screenshot            | `npm run images -- <file> <slug>`     |
+| Task                         | Command                              |
+| ---------------------------- | ------------------------------------ |
+| Dev server (localhost:3000)  | `npm run dev`                        |
+| Production build → `out/`    | `npm run build`                      |
+| Serve the built `out/`       | `npm start`                          |
+| Lint + format + types + unit | `npm run check`                      |
+| Auto-fix lint/format         | `npm run lint:fix`                   |
+| Unit tests / watch           | `npm test` / `npm run test:watch`    |
+| E2E + a11y (needs a build)   | `npm run build && npm run test:e2e`  |
+| Add a screenshot             | `npm run images -- <file> <slug>`    |
+| Regenerate social image      | `npm run build && npm run og`        |
 
 First e2e run on a machine: `npx playwright install chromium`.
 
@@ -39,49 +43,56 @@ First e2e run on a machine: `npx playwright install chromium`.
 
 ```
 src/
-  content/site.ts      ← ALL copy, links, projects, skills. Edit content here only.
+  content/site.ts      ← ALL copy, links, projects, career, stack. Edit content here only.
   app/
-    layout.tsx         fonts, metadata, skip link, `.js` flag script
-    page.tsx           section order
-    globals.css        design tokens (@theme), reveal + screenshot styles
+    layout.tsx         fonts, metadata, Lenis, `.js` flag script
+    page.tsx           section order (+ Dock)
+    globals.css        tokens (@theme), keyframes, duotone, reveal, `condensed`/`stretchy`
     opengraph-image.png, icon.svg, sitemap.ts, robots.ts, not-found.tsx
-  components/          one file per section + small shared pieces
-    Reveal.tsx         scroll-in animation wrapper (client)
-    SiteHeader.tsx     sticky nav, active section, mobile menu (client)
-    ProjectShot.tsx    screenshot frame + blending treatment
-    CopyEmailButton.tsx (client)
-    icons.tsx          inline SVG icons (no icon library)
-  lib/site-url.ts      absolute URL for metadata
-public/projects/       WebP screenshots (1200px max)
-scripts/               serve-static.mjs, optimize-images.mjs
-tests/e2e/             Playwright specs (run against `out/`)
-docs/                  deeper docs, see below
+  components/
+    Hero, Work, Career, Stack, Contact, SiteFooter     sections (server)
+    TopBar, Dock, SoundToggle, LocalClock               page chrome
+    LensImage      duotone screenshot + scroll reveal + colour lens (client)
+    ArchiveList    big-type rows + cursor-following preview (client)
+    RagTerminal    typed terminal illustration (client)
+    CountUp        animated stat numbers (client)
+    Reveal         fade-up on scroll (client, CSS-driven)
+    SmoothScroll   Lenis (client)
+    icons.tsx      inline SVG icons
+  hooks/useActiveSection.ts
+  lib/ambient.ts       generative Web Audio soundtrack
+  lib/sound-store.ts   shared on/off state for all sound toggles
+  lib/site-url.ts
+public/projects/       WebP screenshots (≤1200px)
+scripts/               serve-static, optimize-images, render-og
+tests/e2e/             Playwright specs (run against out/)
+docs/                  see below
 ```
 
 ## Conventions
 
-- Server components by default. Add `"use client"` only for state/effects;
-  keep client components small (currently: header, reveal, copy button).
-- Style with Tailwind utilities using the theme tokens (`bg-bg`, `text-muted`,
-  `text-accent`, `border-line`…). Don't hard-code hex colours in components.
-  New tokens go in `@theme` in `globals.css` and in `docs/DESIGN.md`.
-- Copy is short. One sentence per summary, ≤ 90 chars (a unit test enforces
-  it). No paragraphs.
-- Animations: CSS only (no Framer Motion etc.). Wrap new blocks in
-  `<Reveal>`; stagger with `delay` in 60–120ms steps. Everything must respect
-  `prefers-reduced-motion` (handled globally in `globals.css`).
-- Accessibility is tested (axe in e2e). Keep one `h1`, label sections, give
-  icon-only links an `aria-label`, keep text contrast ≥ 4.5:1.
+- Server components by default. Use `"use client"` only for state, effects or
+  motion, and keep those components small and leaf-level.
+- Style with Tailwind utilities and theme tokens (`bg-bg`, `text-muted`,
+  `text-accent`, `border-line`, `condensed`, `stretchy`). No hard-coded hex in
+  components. New tokens go in `@theme` and in `docs/DESIGN.md`.
+- Copy is short. Unit tests enforce lengths for summaries, highlights, hero
+  lines and stat labels.
+- Motion: CSS keyframes for load-in, `<Reveal>` for scroll-in, `motion` only
+  for scroll-linked or spring/layout effects. Everything must respect
+  `prefers-reduced-motion` (CSS handles it globally; motion components check
+  `useReducedMotion`).
+- Accessibility is tested (axe in e2e). One `h1`; each section has an `h2`
+  (via `SectionLabel`); icon-only controls get `aria-label`; text contrast ≥ 4.5:1.
 - External links: `target="_blank" rel="noreferrer"`.
-- Tests sit next to the code (`Foo.test.tsx`). Content rules live in
+- Tests live next to the code (`Foo.test.tsx`). Content rules are in
   `src/content/site.test.ts`.
-- Imports use the `@/` alias for `src/`.
+- Use the `@/` import alias for `src/`. Biome sorts imports and Tailwind classes.
 
 ## Common tasks
 
-- **Add/edit a project:** see `docs/CONTENT.md` (or the `/add-project` command).
-- **Change look & feel:** read `docs/DESIGN.md` first. It explains the rules
-  that keep the site from looking generic.
+- **Add or edit a project:** `docs/CONTENT.md` (or the `/add-project` command).
+- **Change the look:** read `docs/DESIGN.md` first.
 - **Why is X done this way?** `docs/DECISIONS.md`.
-- **Deploy/Vercel questions:** `docs/DEPLOYMENT.md`.
-- **Testing details:** `docs/TESTING.md`.
+- **Deploying / Vercel:** `docs/DEPLOYMENT.md`.
+- **Tests:** `docs/TESTING.md`.

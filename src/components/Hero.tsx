@@ -1,114 +1,84 @@
-import type { CSSProperties, ReactNode } from "react";
-import { profile, socials } from "@/content/site";
-import { ArrowDown, ArrowUpRight, socialIcons } from "./icons";
-
-/** A line of text that slides up from behind a mask on page load. */
-function RiseLine({ children, delay }: { children: ReactNode; delay: number }) {
-  return (
-    <span className="block overflow-hidden pb-[0.08em]">
-      <span
-        className="block animate-rise"
-        style={{ animationDelay: `${delay}ms` } as CSSProperties}
-      >
-        {children}
-      </span>
-    </span>
-  );
-}
+import type { CSSProperties } from "react";
+import { heroIntro, heroLines, profile, stats } from "@/content/site";
+import { CountUp } from "./CountUp";
+import { ArrowDown, ArrowUpRight } from "./icons";
+import { TopBar } from "./TopBar";
 
 export function Hero() {
   return (
     <section
       id="top"
       aria-label="Introduction"
-      className="relative flex min-h-svh flex-col justify-end overflow-hidden pt-28 pb-12 md:pb-16"
+      className="relative flex min-h-svh flex-col justify-end overflow-x-clip pt-32 pb-32 md:pb-36"
     >
-      {/* Warm glow, top-left. Static on purpose. */}
+      <TopBar />
+
+      {/* Warm glow behind the headline. Static on purpose. */}
       <div
         aria-hidden
-        className="pointer-events-none absolute -top-1/3 -left-1/4 size-[70rem] rounded-full opacity-60 blur-3xl"
+        className="pointer-events-none absolute top-0 right-0 size-[60rem] translate-x-1/3 -translate-y-1/3 rounded-full opacity-70 blur-3xl"
         style={{
-          background:
-            "radial-gradient(closest-side, rgb(242 165 65 / 0.13), transparent)",
+          background: "radial-gradient(closest-side, rgb(244 167 59 / 0.12), transparent)",
         }}
       />
 
-      <div className="relative mx-auto w-full max-w-6xl px-5 md:px-8">
-        <p className="mb-8 flex items-center gap-3 font-mono text-xs tracking-widest text-muted uppercase">
-          <span className="inline-block h-px w-8 bg-accent" aria-hidden />
-          <RiseLine delay={0}>
-            {profile.role} · {profile.location}
-          </RiseLine>
+      <div className="relative mx-auto w-full max-w-7xl px-5 md:px-10">
+        <p className="mb-6 flex animate-fade-up items-center gap-3 font-mono text-[13px] text-muted [animation-delay:100ms] md:mb-10">
+          <span className="h-px w-10 bg-accent" aria-hidden />
+          {profile.name} — {profile.role}
         </p>
 
-        <h1 className="text-[clamp(3.5rem,13vw,10.5rem)] leading-[0.88] font-medium tracking-[-0.045em]">
-          <RiseLine delay={120}>{profile.firstName}</RiseLine>
-          <RiseLine delay={220}>
-            <span className="text-muted">
-              {profile.name.split(" ").slice(1).join(" ")}
+        <h1 className="condensed text-[clamp(3.4rem,13.5vw,13.5rem)] uppercase leading-[0.84]">
+          <span className="sr-only">{profile.name}: </span>
+          {heroLines.map((line, i) => (
+            <span key={line.text} className="block overflow-hidden pt-[0.04em]">
+              <span
+                className={`block animate-settle ${line.accent ? "text-accent" : ""}`}
+                style={{ animationDelay: `${150 + i * 120}ms` } as CSSProperties}
+              >
+                {line.text}
+              </span>
             </span>
-            <span className="text-accent">.</span>
-          </RiseLine>
+          ))}
         </h1>
 
-        <div className="mt-10 grid gap-10 md:mt-14 md:grid-cols-[1fr_auto] md:items-end">
-          <div className="max-w-md">
-            <p className="text-xl tracking-tight md:text-2xl">
-              <RiseLine delay={380}>{profile.headline}</RiseLine>
-            </p>
-            <p className="mt-2 text-base text-muted md:text-lg">
-              <RiseLine delay={460}>{profile.intro}</RiseLine>
-            </p>
-
-            <div className="mt-8 flex animate-rise flex-wrap gap-3 [animation-delay:560ms]">
+        <div className="mt-12 grid gap-12 md:mt-16 lg:grid-cols-[1fr_1.25fr] lg:items-end">
+          <div className="animate-fade-up [animation-delay:700ms]">
+            <p className="max-w-md text-muted text-xl leading-snug md:text-2xl">{heroIntro}</p>
+            <div className="mt-8 flex flex-wrap gap-3">
               <a
                 href="#work"
-                className="group inline-flex items-center gap-2 rounded-full bg-fg px-5 py-3 text-sm font-medium text-bg transition-colors hover:bg-accent"
+                className="group inline-flex items-center gap-2 rounded-full bg-fg px-6 py-3.5 font-medium text-base text-bg transition-colors hover:bg-accent"
               >
-                See my work
+                See the work
                 <ArrowDown className="size-4 transition-transform group-hover:translate-y-0.5" />
-              </a>
-              <a
-                href="#contact"
-                className="group inline-flex items-center gap-2 rounded-full border border-line-strong px-5 py-3 text-sm transition-colors hover:border-fg"
-              >
-                Get in touch
-                <ArrowUpRight className="size-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
               </a>
               {profile.resumeUrl && (
                 <a
                   href={profile.resumeUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex items-center px-2 py-3 text-sm text-muted underline-offset-4 transition-colors hover:text-fg hover:underline"
+                  className="group inline-flex items-center gap-2 rounded-full border border-line-strong px-6 py-3.5 text-base transition-colors hover:border-fg"
                 >
                   Résumé
+                  <ArrowUpRight className="size-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                 </a>
               )}
             </div>
           </div>
 
-          <ul
-            className="flex animate-rise gap-2 [animation-delay:640ms]"
-            aria-label="Social links"
-          >
-            {socials.map(({ label, href, icon }) => {
-              const Icon = socialIcons[icon];
-              return (
-                <li key={label}>
-                  <a
-                    href={href}
-                    target="_blank"
-                    rel="noreferrer"
-                    aria-label={label}
-                    className="grid size-11 place-items-center rounded-full border border-line text-muted transition-colors hover:border-line-strong hover:text-fg"
-                  >
-                    <Icon className="size-[18px]" />
-                  </a>
-                </li>
-              );
-            })}
-          </ul>
+          <dl className="grid animate-fade-up grid-cols-2 gap-x-6 gap-y-8 [animation-delay:850ms]">
+            {stats.map((stat) => (
+              <div key={stat.label} className="flex flex-col-reverse border-line border-t pt-4">
+                <dt className="mt-2 font-mono text-[13px] text-muted leading-relaxed">
+                  {stat.label}
+                </dt>
+                <dd className="condensed text-5xl md:text-6xl">
+                  <CountUp {...stat} />
+                </dd>
+              </div>
+            ))}
+          </dl>
         </div>
       </div>
     </section>

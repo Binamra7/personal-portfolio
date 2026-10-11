@@ -1,67 +1,93 @@
 # Design
 
-The site should feel like a calm, well-set page, not a template. Dark,
-minimal, warm, with very little text.
+A dark, typographic, poster-like page. Few words, set very large.
+It should feel calm and deliberate, not like a template.
 
 ## Rules (please keep them)
 
-1. **One accent colour.** Warm amber `--color-accent: #f2a541`. Use it
-   sparingly: section numbers, the dot after the name, hover states,
-   milestones. **No purple, no blue-to-purple gradients, no neon.**
-2. **No bento / card grids, no glassmorphism cards.** Layout is editorial:
-   single column, hairline dividers (`border-line`), generous whitespace,
-   left-aligned.
-3. **Short copy.** Headlines ≤ 6 words, summaries one sentence. If it needs a
-   paragraph, it doesn't belong on the page.
-4. **Type does the heavy lifting.** Big tight display type for the name and the
-   contact heading. Small uppercase mono labels for meta (`01 — Work`).
-5. **Motion is subtle.** Things rise a little and fade in, once. Nothing loops,
-   nothing follows the cursor, nothing bounces. Easing: `--ease-out-soft`.
-6. **Accessible by default.** Contrast ≥ 4.5:1 for text (axe checks it in
-   CI), visible focus rings (amber outline), reduced motion respected.
+1. **One accent.** Saffron `#f4a73b`. Use it for the hero's middle line,
+   section numbers, periods, active states and hover. **No purple, no
+   blue-to-purple gradients, no neon, no glassmorphism cards.**
+2. **No bento or card grids.** Editorial layout: hairline dividers, big type,
+   generous space, left-aligned.
+3. **Hierarchy is flipped.** The statement is huge and the name is a small mono
+   label. Section labels are small mono rows (`01  SELECTED WORK ———`).
+   Project titles, roles and tools are set in big condensed caps.
+4. **Short copy.** Hero lines ≤ 16 chars, summaries ≤ 90, highlights ≤ 70.
+   Unit tests enforce this.
+5. **Minimum sizes.** Mono labels are 13px or larger, body text 16px or larger.
+6. **Motion has a purpose and plays once.** Nothing bounces, and nothing loops
+   except the sound bars while audio plays.
+7. **Accessible.** Contrast ≥ 4.5:1 (axe checks it), focus rings visible,
+   reduced motion respected everywhere.
 
-## Tokens (`src/app/globals.css` → `@theme`)
+## Type
 
-| Token         | Value     | Use                                    |
-| ------------- | --------- | -------------------------------------- |
-| `bg`          | `#0b0b0a` | page background (warm near-black)      |
-| `surface`     | `#141412` | screenshot frames                      |
-| `raised`      | `#1c1c19` | frame title bar                        |
-| `line`        | fg @ 9%   | hairline dividers, borders             |
-| `line-strong` | fg @ 18%  | hover borders, button outlines         |
-| `fg`          | `#ecebe4` | primary text (warm off-white)          |
-| `muted`       | `#adaba2` | secondary text                         |
-| `faint`       | `#8a8880` | labels, meta (lowest allowed contrast) |
-| `accent`      | `#f2a541` | the one accent                         |
+| Role            | Font                     | Notes                                                        |
+| --------------- | ------------------------ | ------------------------------------------------------------ |
+| Display / body  | **Bricolage Grotesque**  | Variable: weight 200–800, width 75–100, optical size 12–96   |
+| Labels / meta   | **Martian Mono**         | Wide mono, good contrast with the condensed display face     |
 
-Fonts: **Space Grotesk** (`font-sans`) for everything, **JetBrains Mono**
-(`font-mono`) for small labels, tags and the fake address bar.
+Utilities in `globals.css`:
 
-Container: `max-w-6xl` with `px-5 md:px-8`. Sections: `py-24 md:py-36`,
-separated by `border-t border-line`.
+- `condensed`: width 75, weight 700, tight tracking. Used for headlines.
+- `stretchy`: condensed at rest, widens to 100 on hover (career titles,
+  "Let's talk").
 
-## Screenshots
+## Tokens (`@theme` in `src/app/globals.css`)
 
-The screenshots are old, bright and come in different sizes. `ProjectShot` makes
-them fit in:
+| Token         | Value       | Use                                   |
+| ------------- | ----------- | ------------------------------------- |
+| `bg`          | `#0b0b0a`   | page (warm near-black)                |
+| `surface`     | `#131311`   | terminal, image placeholder           |
+| `raised`      | `#1b1b18`   | dock                                  |
+| `line`        | fg @ 10%    | hairlines                             |
+| `line-strong` | fg @ 20%    | outlines, label rules                 |
+| `fg`          | `#ecebe4`   | text                                  |
+| `muted`       | `#adaba2`   | secondary text                        |
+| `faint`       | `#8a8880`   | meta (lowest allowed contrast)        |
+| `accent`      | `#f4a73b`   | the one accent                        |
+| `sand`        | `#d4c3a1`   | duotone highlight colour              |
 
-- A minimal **browser frame** (grey dots + mono address bar) makes them look
-  like they belong there.
-- Fixed **16:9 aspect**, `object-cover object-top`: any size crops the same way.
-- **Muted by default**: `grayscale(.9) brightness(.52)`, plus an amber
-  `mix-blend-color` tint at 10%. Bright white UIs turn into soft warm grey.
-- **Bottom fade** into the frame colour.
-- **Hover/focus on the row** brings back full colour and a 2.5% zoom.
-- Touch devices (`hover: none`) get a middle setting, since they can't hover.
+## Screenshots: duotone + lens
 
-Swapping in sharper screenshots later needs no layout changes.
+The screenshots are old, bright and inconsistent. They're treated as prints:
+
+- **Duotone** (`.duotone`): the image is greyscaled and multiplied over
+  `sand`, then a `lighten` layer lifts black to the page colour. Every
+  screenshot maps from page-black to sand, so they all match.
+- **Scroll reveal**: `LensImage` animates `clip-path` from an inset rounded
+  rectangle to full bleed, with a ±6% parallax drift inside.
+- **Colour lens**: a 170px circle follows the mouse and shows the real
+  colours (a second copy of the image clipped with
+  `circle(var(--lens-r) at var(--x) var(--y))`; `--lens-r` is a registered
+  `@property`, so the radius animates). Tapping on touch screens toggles full colour.
+- **Archive previews**: `ArchiveList` shows a tilted, full-colour thumbnail that
+  trails the cursor on a spring. Desktop only.
+- Projects with no screenshot use a built-in visual (`RagTerminal`).
+
+Better screenshots can be dropped in later without any layout change.
 
 ## Motion inventory
 
-| Where       | What                                               |
-| ----------- | -------------------------------------------------- |
-| Hero        | lines rise out of a mask, staggered 0–640ms        |
-| Sections    | `<Reveal>` fade + 20px rise on first view          |
-| Screenshots | colour + zoom on hover (700–900ms)                 |
-| Links/icons | arrow nudges, colour transitions                   |
-| Header      | transparent → blurred background after 24px scroll |
+| Where           | What                                                           | How                    |
+| --------------- | -------------------------------------------------------------- | ---------------------- |
+| Hero lines      | rise from a mask while settling wide/light → condensed/bold    | CSS `settle` keyframes |
+| Hero stats      | count up (3.2s counts *down* to 1.2s)                          | `CountUp` (rAF)        |
+| Section labels  | hairline draws in                                              | `.draw-line` + Reveal  |
+| Blocks          | fade + rise on first view                                      | `Reveal`               |
+| Screenshots     | clip-path open + parallax + colour lens                        | motion `useScroll`     |
+| Archive         | spring-follow preview, arrow rotates                           | motion springs         |
+| Terminal        | types out once in view                                         | `RagTerminal`          |
+| Dock            | slides up after the hero; active pill slides between links     | CSS + motion `layoutId`|
+| Career / contact| headline widens on hover                                       | `stretchy`             |
+| Page            | inertial smooth scroll                                         | Lenis                  |
+
+## Sound
+
+`lib/ambient.ts` synthesises the music live with Web Audio: a detuned
+A/E drone through a slowly breathing low-pass filter, plus random A-minor
+pentatonic chimes every 3–8s through a generated reverb. Master volume is
+0.07. It's off by default and starts only on click (browsers block
+autoplay). It fades in and out, and pauses while the tab is hidden. Toggles
+in the top bar and dock share state through `lib/sound-store.ts`.

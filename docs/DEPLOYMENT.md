@@ -19,16 +19,16 @@ exists. If the dashboard overrides any of these, reset them to default:
 - **Install Command:** default (`npm install`/`npm ci`; this repo uses npm)
 - **Node.js Version:** 22.x or 24.x
 
-Optional env var: `NEXT_PUBLIC_SITE_URL=https://your-domain` if you use a
-custom domain (for correct canonical/OG URLs). Without it, the Vercel
-production URL is used.
+Optional env var: `NEXT_PUBLIC_SITE_URL=https://your-domain` if you add a
+custom domain (for correct canonical/OG URLs). Without it, Vercel's production
+URL (currently `binamrakhadka.vercel.app`) is used.
 
 ## CI (GitHub Actions)
 
 `.github/workflows/ci.yml` runs on PRs and on pushes to `main`:
 
-1. **check**: format, lint, typecheck, unit tests + coverage, `npm audit`
-   on production deps.
+1. **check**: `biome ci` (lint + format), typecheck, unit tests +
+   coverage, and `npm audit` on production deps.
 2. **e2e**: build, then Playwright + axe on desktop and mobile. On failure the
    HTML report is uploaded as an artifact.
 

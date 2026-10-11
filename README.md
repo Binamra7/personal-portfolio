@@ -1,9 +1,13 @@
 # Binamra Khadka — Portfolio
 
-My personal site. One static page with a dark, minimal look: work, about, skills, contact.
+Live at **[binamrakhadka.vercel.app](https://binamrakhadka.vercel.app)**.
 
-**Stack:** Next.js 16 (static export) · React 19 · TypeScript · Tailwind CSS v4 ·
-Vitest · Playwright · Vercel
+A single, dark, typographic page: big statement, work, career, stack, contact.
+It has a variable-font animation, duotone screenshots with a colour lens, and
+an optional generative ambient soundtrack.
+
+**Stack:** Next.js 16 (static export) · React 19 · TypeScript 7 · Tailwind CSS v4 ·
+motion · Lenis · Biome · Vitest · Playwright · Vercel
 
 ## Quick start
 
@@ -18,21 +22,22 @@ npm run dev        # http://localhost:3000
 ```bash
 npm run build      # static site → out/
 npm start          # serve out/ locally
-npm run check      # format + lint + typecheck + unit tests
-npm run test:e2e   # Playwright + axe, against out/ (build first)
+npm run check      # Biome + typecheck + unit tests
+npm run test:e2e   # Playwright + axe against out/ (build first)
 npm run images -- ./shot.png my-app   # add a screenshot
+npm run og         # regenerate the social preview image (after a build)
 ```
 
 ## Editing content
 
-Everything you see on the page is in [`src/content/site.ts`](src/content/site.ts).
+Everything on the page lives in [`src/content/site.ts`](src/content/site.ts).
 See [docs/CONTENT.md](docs/CONTENT.md).
 
 ## Docs
 
 - [AGENTS.md](AGENTS.md): start here (humans and AI agents)
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md): how it fits together
-- [docs/DESIGN.md](docs/DESIGN.md): design system and rules
+- [docs/DESIGN.md](docs/DESIGN.md): design system, motion, image treatment
 - [docs/CONTENT.md](docs/CONTENT.md): adding projects, changing copy
 - [docs/TESTING.md](docs/TESTING.md): unit, e2e and accessibility tests
 - [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md): Vercel, CI, branches

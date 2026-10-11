@@ -1,50 +1,53 @@
 # Editing content
 
-All content is in **`src/content/site.ts`**. You shouldn't need to touch
-components to change text, links or projects.
+Everything is in **`src/content/site.ts`**. Facts should match the résumé in
+`public/binamra-khadka-resume.pdf`.
+
+| What                       | Export             |
+| -------------------------- | ------------------ |
+| Name, role, city, email…   | `profile`          |
+| Giant hero statement       | `heroLines` (≤ 16 chars each, one may be `accent`) |
+| Line under the statement   | `heroIntro`        |
+| Count-up numbers           | `stats` (`from` lets a number count *down*) |
+| Big project showcases      | `featuredProjects` |
+| Older projects list        | `archiveProjects`  |
+| Jobs                       | `career` (≤ 3 highlights, ≤ 70 chars each) |
+| Degree                     | `education`        |
+| Tools                      | `toolkit`          |
+| Social links               | `socials` (`github` / `linkedin`; add icons in `components/icons.tsx`) |
+| Dock links                 | `navItems` (must match section ids) |
 
 ## Add a project
 
-1. Take a screenshot of the app, ideally 16:9 and at least 1200px wide.
-   The top of the image is what's kept when cropping.
-2. Convert it:
-   ```bash
-   npm run images -- ~/Downloads/my-app.png my-app
-   # → public/projects/my-app.webp
-   ```
-3. Add an entry to `projects` in `site.ts`:
+1. Screenshot the app, ideally 16:9 and ≥ 1200px wide. The top of the image is
+   kept when cropping.
+2. `npm run images -- ~/Downloads/shot.png my-app` → `public/projects/my-app.webp`
+3. Add the entry:
    ```ts
    {
-     slug: "my-app",                       // lowercase-dashes, unique
+     slug: "my-app",
      title: "My App",
      summary: "One short sentence, under 90 characters.",
-     image: "/projects/my-app.webp",
-     imageAlt: "What the screenshot shows",
      stack: ["Next.js", "Postgres"],
-     sourceUrl: "https://github.com/binamra7/my-app",
-     liveUrl: "https://my-app.vercel.app", // optional
-   },
+     sourceUrl: "https://github.com/binamra7/my-app", // omit if private
+     liveUrl: "https://my-app.vercel.app",            // optional
+     image: { src: "/projects/my-app.webp", alt: "What the screenshot shows" },
+     year: "2026",
+   }
    ```
-   Array order = display order. The first project's image loads eagerly.
-4. `npm run check`. The content tests check the image exists, the links are
-   https and the summary is short enough.
+   Put it in `featuredProjects` (large, with the duotone lens) or
+   `archiveProjects` (list row with hover preview, image required).
+   A featured project without a screenshot needs a `visual`. Add new visuals
+   next to `RagTerminal` and wire them up in `components/Work.tsx`.
+4. `npm run check`
 
-## Other content
+## Résumé
 
-- **Name, role, headline, email, phone:** `profile`
-- **Résumé button:** put the PDF in `public/` and set
-  `profile.resumeUrl = "/resume.pdf"`. The button appears in the hero, and a
-  test checks the file exists.
-- **Social links:** `socials` (`icon` must be `github`, `linkedin` or `x`; add
-  more in `components/icons.tsx` → `socialIcons`).
-- **About text and timeline:** `about`
-- **Skills:** `skills`
-- **Nav:** `navItems`. Each `href` must match a section `id`.
+The PDF is served from `public/binamra-khadka-resume.pdf`. To update it,
+replace the file and keep the name. Set `profile.resumeUrl = null` to hide
+all résumé links.
 
 ## Social preview image
 
-`src/app/opengraph-image.png` (1200×630) is a static file. If you change the
-name, role or headline, regenerate it. Restore the generator from git history
-(`git log --all -- src/app/opengraph-image.tsx`), build, and copy
-`out/opengraph-image` over the PNG. Or make one in any design tool using the
-tokens in DESIGN.md.
+After changing the hero copy, edit the card markup in `scripts/render-og.mjs`,
+then run `npm run build && npm run og`.

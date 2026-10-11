@@ -1,12 +1,12 @@
 "use client";
 
 import {
-  useEffect,
-  useRef,
-  useState,
   type CSSProperties,
   type ElementType,
   type ReactNode,
+  useEffect,
+  useRef,
+  useState,
 } from "react";
 
 type RevealProps = {
@@ -21,12 +21,7 @@ type RevealProps = {
  * Fades its children up once they scroll into view. Styling lives in
  * globals.css (`[data-reveal]`) so reduced-motion and no-JS are handled in CSS.
  */
-export function Reveal({
-  children,
-  as: Tag = "div",
-  delay = 0,
-  className,
-}: RevealProps) {
+export function Reveal({ children, as: Tag = "div", delay = 0, className }: RevealProps) {
   const ref = useRef<HTMLElement>(null);
   const [visible, setVisible] = useState(false);
 
@@ -55,11 +50,7 @@ export function Reveal({
       data-reveal=""
       data-visible={visible}
       className={className}
-      style={
-        delay
-          ? ({ "--reveal-delay": `${delay}ms` } as CSSProperties)
-          : undefined
-      }
+      style={delay ? ({ "--reveal-delay": `${delay}ms` } as CSSProperties) : undefined}
     >
       {children}
     </Tag>

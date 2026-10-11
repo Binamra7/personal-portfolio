@@ -1,38 +1,40 @@
 import type { Metadata, Viewport } from "next";
-import { JetBrains_Mono, Space_Grotesk } from "next/font/google";
-import { profile } from "@/content/site";
+import { Bricolage_Grotesque, Martian_Mono } from "next/font/google";
+import { SmoothScroll } from "@/components/SmoothScroll";
+import { heroIntro, profile } from "@/content/site";
 import { getSiteUrl } from "@/lib/site-url";
 import "./globals.css";
 
 // Fonts are downloaded at build time and self-hosted: no runtime request to Google.
-const sans = Space_Grotesk({
+// Bricolage is variable in weight + width; the design animates the width axis.
+const display = Bricolage_Grotesque({
   subsets: ["latin"],
-  variable: "--font-space-grotesk",
+  axes: ["wdth", "opsz"],
+  variable: "--font-bricolage",
   display: "swap",
 });
 
-const mono = JetBrains_Mono({
+const mono = Martian_Mono({
   subsets: ["latin"],
-  variable: "--font-jetbrains-mono",
+  variable: "--font-martian",
   display: "swap",
 });
 
 const title = `${profile.name} — ${profile.role}`;
-const description = `${profile.headline} ${profile.intro}`;
 
 export const metadata: Metadata = {
   metadataBase: new URL(getSiteUrl()),
   title,
-  description,
+  description: heroIntro,
   authors: [{ name: profile.name }],
   openGraph: {
     type: "website",
     title,
-    description,
+    description: heroIntro,
     siteName: profile.name,
     locale: "en_GB",
   },
-  twitter: { card: "summary_large_image", title, description },
+  twitter: { card: "summary_large_image", title, description: heroIntro },
 };
 
 export const viewport: Viewport = {
@@ -44,27 +46,21 @@ export const viewport: Viewport = {
 // apply when they can be undone (see `.js [data-reveal]` in globals.css).
 const jsFlag = "document.documentElement.classList.add('js')";
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html
-      lang="en-GB"
-      className={`${sans.variable} ${mono.variable}`}
-      suppressHydrationWarning
-    >
+    <html lang="en-GB" className={`${display.variable} ${mono.variable}`} suppressHydrationWarning>
       <head>
+        {/* biome-ignore lint/security/noDangerouslySetInnerHtml: static, trusted one-liner */}
         <script dangerouslySetInnerHTML={{ __html: jsFlag }} />
       </head>
       <body>
         <a
           href="#work"
-          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[60] focus:rounded-full focus:bg-fg focus:px-4 focus:py-2 focus:text-sm focus:text-bg"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[60] focus:rounded-full focus:bg-fg focus:px-4 focus:py-2 focus:text-bg"
         >
           Skip to content
         </a>
+        <SmoothScroll />
         {children}
       </body>
     </html>

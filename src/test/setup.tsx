@@ -6,12 +6,9 @@ afterEach(() => cleanup());
 
 // next/image renders a plain <img> in tests.
 vi.mock("next/image", () => ({
-  default: ({
-    fill: _fill,
-    priority: _priority,
-    ...props
-  }: Record<string, unknown>) => {
-    // eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text
+  default: ({ fill: _fill, priority: _priority, ...props }: Record<string, unknown>) => {
+    // biome-ignore lint/performance/noImgElement: test double for next/image
+    // biome-ignore lint/a11y/useAltText: alt is passed through in props
     return <img {...props} />;
   },
 }));

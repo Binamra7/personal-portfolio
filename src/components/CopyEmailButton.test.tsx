@@ -6,9 +6,7 @@ import { CopyEmailButton } from "./CopyEmailButton";
 describe("<CopyEmailButton />", () => {
   it("copies the email and confirms", async () => {
     const user = userEvent.setup();
-    const writeText = vi
-      .spyOn(navigator.clipboard, "writeText")
-      .mockResolvedValue();
+    const writeText = vi.spyOn(navigator.clipboard, "writeText").mockResolvedValue();
     render(<CopyEmailButton email="me@example.com" />);
 
     await user.click(screen.getByRole("button", { name: /copy email/i }));
@@ -19,9 +17,7 @@ describe("<CopyEmailButton />", () => {
 
   it("stays usable when the clipboard is blocked", async () => {
     const user = userEvent.setup();
-    vi.spyOn(navigator.clipboard, "writeText").mockRejectedValue(
-      new Error("denied"),
-    );
+    vi.spyOn(navigator.clipboard, "writeText").mockRejectedValue(new Error("denied"));
     render(<CopyEmailButton email="me@example.com" />);
 
     await user.click(screen.getByRole("button", { name: /copy email/i }));
