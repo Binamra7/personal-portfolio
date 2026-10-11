@@ -22,7 +22,12 @@ vi.mock("./ambient", () => ({
 }));
 
 let hidden = false;
-const flush = () => new Promise((r) => setTimeout(r, 0));
+// Wait for the store's lazy `import("./ambient")` and the work chained after it.
+// A single macrotask isn't always enough, and leftovers would leak into the next test.
+async function flush() {
+  await vi.dynamicImportSettled();
+  await new Promise((r) => setTimeout(r, 0));
+}
 
 async function loadStore() {
   vi.resetModules();
@@ -55,7 +60,8 @@ for (const target of [window, document]) {
   };
 }
 
-afterEach(() => {
+afterEach(async () => {
+  await flush();
   for (const [target, type, listener, options] of added.splice(0)) {
     target.removeEventListener(type, listener, options as EventListenerOptions);
   }

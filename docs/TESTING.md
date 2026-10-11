@@ -28,6 +28,9 @@ npx playwright test --ui
 - `sound-store.test.ts` stubs `AudioContext` with a fake whose `resume()`
   only succeeds when "allowed", to test autoplay, gesture retries, hidden tabs
   and mutes. Each test loads a fresh store module and removes its listeners.
+  `flush()` awaits `vi.dynamicImportSettled()`: the store lazy-loads the synth,
+  and a pending import from one test once leaked an `engine.start()` call
+  into the next (flaky, about 1 run in 8). Await async work you started before a test ends.
 - `toBeVisible()` treats `opacity: 0` as visible. For reveal or fade effects,
   assert `data-visible` / `data-active` or `toHaveCSS("opacity", "1")`.
   After writing a test, break the feature once to confirm the test fails.
