@@ -58,6 +58,8 @@ src/
     CountUp        animated stat numbers (client)
     Reveal         fade-up on scroll (client, CSS-driven)
     StretchText    hover-widening text that reserves its width (no reflow)
+    TimelineRow    shared row for Career and Education
+    Glow           soft accent background glow
     scroll/        scroll-linked effects: HeroHeadline, ScrollFillText,
                    DriftRow, ScrollProgressLine, ScaleIn
     SmoothScroll   Lenis (client)
@@ -66,6 +68,7 @@ src/
   lib/ambient.ts       generative Web Audio soundtrack (lazy chunk)
   lib/sound-store.ts   sound state: on by default, starts on first interaction
   lib/scroll-progress.ts  shared scroll loop → CSS `--p`
+  lib/in-view.ts       run something once when an element enters the viewport
   lib/image-loader.ts  next/image loader for pre-generated widths
   lib/site-url.ts
 public/projects/       WebP screenshots (≤1200px)

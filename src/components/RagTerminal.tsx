@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { onceInView } from "@/lib/in-view";
 import { prefersReducedMotion } from "@/lib/scroll-progress";
 
-/** A short scripted session for the RAG assistant project (illustrative). */
+/** Illustrative session for the RAG assistant project. */
 export const TERMINAL_SCRIPT = [
   { text: '$ ask "why was /orders slow last june?"', tone: "fg" },
   { text: "  searching 10,412 chunks …", tone: "faint" },
@@ -15,13 +16,18 @@ export const TERMINAL_SCRIPT = [
   { text: "[1] notes/perf/2025-06.md#orders-endpoint", tone: "accent" },
 ] as const;
 
-const TOTAL = TERMINAL_SCRIPT.reduce((n, line) => n + line.text.length + 1, 0);
+const TONE = { fg: "text-fg", faint: "text-faint", accent: "text-accent" };
+const CHARS_PER_SECOND = 70;
 
-const toneClass = { fg: "text-fg", faint: "text-faint", accent: "text-accent" };
+// Character offset where each line starts (+1 per line for the line break).
+const LINE_STARTS = TERMINAL_SCRIPT.map((_, i) =>
+  TERMINAL_SCRIPT.slice(0, i).reduce((n, line) => n + line.text.length + 1, 0),
+);
+const TOTAL = (LINE_STARTS.at(-1) ?? 0) + (TERMINAL_SCRIPT.at(-1)?.text.length ?? 0);
 
 /**
- * Types the script out once it scrolls into view. Untyped characters are
- * rendered invisible so the box never changes size.
+ * Types the script out once in view. Untyped characters stay in the DOM but
+ * invisible, so the box never changes size.
  */
 export function RagTerminal() {
   const ref = useRef<HTMLDivElement>(null);
@@ -29,32 +35,31 @@ export function RagTerminal() {
 
   useEffect(() => {
     const node = ref.current;
-    if (!node || typeof IntersectionObserver === "undefined") return;
-    if (prefersReducedMotion()) return;
+    if (!node || prefersReducedMotion() || typeof IntersectionObserver === "undefined") return;
 
-    let timer: ReturnType<typeof setInterval> | undefined;
     setTyped(0);
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (!entry?.isIntersecting) return;
-        observer.disconnect();
-        timer = setInterval(() => {
-          setTyped((n) => {
-            if (n >= TOTAL) clearInterval(timer);
-            return Math.min(n + 2, TOTAL);
-          });
-        }, 28);
+    let frame = 0;
+    const stop = onceInView(
+      node,
+      () => {
+        const start = performance.now();
+        const step = (now: number) => {
+          const chars = Math.min(TOTAL, Math.floor(((now - start) / 1000) * CHARS_PER_SECOND));
+          setTyped(chars);
+          if (chars < TOTAL) frame = requestAnimationFrame(step);
+        };
+        frame = requestAnimationFrame(step);
       },
       { threshold: 0.5 },
     );
-    observer.observe(node);
     return () => {
-      observer.disconnect();
-      clearInterval(timer);
+      stop();
+      cancelAnimationFrame(frame);
     };
   }, []);
 
-  let remaining = typed;
+  const caretLine = typed < TOTAL ? LINE_STARTS.findLastIndex((start) => start <= typed) : -1;
+
   return (
     <div
       ref={ref}
@@ -62,21 +67,19 @@ export function RagTerminal() {
     >
       <pre
         role="img"
-        className="flex-1 overflow-hidden px-5 py-8 font-mono text-[12px] leading-relaxed sm:text-sm md:px-10 md:py-14 md:text-lg"
         aria-label="Example session: the assistant answers a question from notes and cites its source"
+        className="flex-1 overflow-hidden px-5 py-8 font-mono text-[12px] leading-relaxed sm:text-sm md:px-10 md:py-14 md:text-lg"
       >
         {TERMINAL_SCRIPT.map((line, i) => {
-          const visible = Math.max(0, Math.min(line.text.length, remaining));
-          remaining -= line.text.length + 1;
-          const isCaretLine = remaining < 0 && remaining > -(line.text.length + 2) && typed < TOTAL;
+          const shown = Math.max(0, Math.min(line.text.length, typed - (LINE_STARTS[i] ?? 0)));
           return (
             // biome-ignore lint/suspicious/noArrayIndexKey: static script
-            <div key={i} className={toneClass[line.tone]} aria-hidden>
-              {line.text.slice(0, visible)}
-              {isCaretLine && (
+            <div key={i} className={TONE[line.tone]} aria-hidden>
+              {line.text.slice(0, shown)}
+              {i === caretLine && (
                 <span className="inline-block h-[1em] w-[0.55em] translate-y-[0.15em] bg-accent" />
               )}
-              <span className="opacity-0">{line.text.slice(visible) || " "}</span>
+              <span className="opacity-0">{line.text.slice(shown) || " "}</span>
             </div>
           );
         })}

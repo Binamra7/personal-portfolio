@@ -1,5 +1,6 @@
 import { profile, socials } from "@/content/site";
 import { CopyEmailButton } from "./CopyEmailButton";
+import { Glow } from "./Glow";
 import { ArrowUpRight, socialIcons } from "./icons";
 import { Reveal } from "./Reveal";
 import { SectionLabel } from "./SectionLabel";
@@ -13,13 +14,7 @@ export function Contact() {
       id="contact"
       className="relative overflow-x-clip pt-28 pb-16 md:pt-40"
     >
-      <div
-        aria-hidden
-        className="pointer-events-none absolute bottom-0 left-1/2 size-[70rem] -translate-x-1/2 translate-y-1/2 rounded-full opacity-70"
-        style={{
-          background: "radial-gradient(closest-side, rgb(244 167 59 / 0.12), transparent)",
-        }}
-      />
+      <Glow className="bottom-0 left-1/2 size-[70rem] -translate-x-1/2 translate-y-1/2" />
 
       <div className="relative mx-auto max-w-7xl px-5 md:px-10">
         <SectionLabel index="05" label="Contact" aside={`${profile.city}, ${profile.country}`} />

@@ -5,17 +5,16 @@ import { heroIntro, profile } from "@/content/site";
 import { getSiteUrl } from "@/lib/site-url";
 import "./globals.css";
 
-// Fonts are downloaded at build time and self-hosted: no runtime request to Google.
-// Bricolage is variable in weight + width (the design animates both). The
-// optical-size axis isn't used, so it's left out to shrink the font file.
+// Self-hosted at build time. Bricolage needs its width axis (animated) and its
+// optical-size axis: without it, large headlines render with the wider text cut.
 const display = Bricolage_Grotesque({
   subsets: ["latin"],
-  axes: ["wdth"],
+  axes: ["wdth", "opsz"],
   variable: "--font-bricolage",
   display: "swap",
 });
 
-// One static weight: labels never change weight.
+// Labels only use one weight, so a static file is enough.
 const mono = Martian_Mono({
   subsets: ["latin"],
   weight: "400",
@@ -45,8 +44,7 @@ export const viewport: Viewport = {
   colorScheme: "dark",
 };
 
-// Marks JS as available before first paint so scroll-reveal styles only
-// apply when they can be undone (see `.js [data-reveal]` in globals.css).
+// Set before first paint so reveal styles only hide content when JS can show it again.
 const jsFlag = "document.documentElement.classList.add('js')";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

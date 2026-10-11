@@ -15,9 +15,7 @@ function FeaturedProject({ project, index }: { project: Project; index: number }
       className="mb-28 last:mb-0 md:mb-40"
     >
       <Reveal className="mb-4 flex items-end justify-between gap-6 font-mono text-[13px] text-muted">
-        <span>
-          <span className="text-accent">{String(index + 1).padStart(2, "0")}</span>
-        </span>
+        <span className="text-accent">{String(index + 1).padStart(2, "0")}</span>
         <span className="hidden text-right sm:block">{project.stack.join(" · ")}</span>
       </Reveal>
 

@@ -3,17 +3,13 @@
 import { type RefObject, useEffect } from "react";
 
 /**
- * A tiny, dependency-free replacement for scroll-linked animation libraries.
+ * Scroll-linked animation without a library. Registered elements get a 0→1
+ * CSS variable (default `--p`) that CSS maps to transforms. One shared rAF
+ * loop does a read pass then a write pass, so scrolling never re-renders React.
  *
- * Elements register a scroll range; one shared rAF loop measures them all and
- * writes a 0→1 CSS custom property (default `--p`) on each. CSS turns that
- * into transforms, so scrolling causes **no React renders** and no layout
- * work beyond one batched read pass and one write pass per frame.
- *
- * Offsets mirror the familiar "edge meets viewport line" model:
- *   [["start", 0.95], ["start", 0.4]]
- *   = 0 when the element's top hits 95% down the viewport,
- *     1 when its top reaches 40%.
+ * Offsets say where an element edge meets a viewport line:
+ *   [["start", 0.95], ["start", 0.4]] is 0 when the element's top is 95% down
+ *   the viewport and 1 when it reaches 40%.
  */
 export type Edge = "start" | "end";
 export type ScrollOffset = readonly [readonly [Edge, number], readonly [Edge, number]];
@@ -48,11 +44,10 @@ export function progressFor(
 function update() {
   frame = 0;
   const vh = window.innerHeight;
-  // Read pass (layout reads only)…
+  // Read every rect before writing any style, so the browser lays out once.
   const values: number[] = [];
   for (const s of subscribers)
     values.push(progressFor(s.target.getBoundingClientRect(), vh, s.offset));
-  // …then write pass, so reads and writes never interleave.
   let i = 0;
   for (const s of subscribers) {
     const p = values[i++] ?? 0;
@@ -89,9 +84,9 @@ export const prefersReducedMotion = () =>
   (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false);
 
 /**
- * Writes scroll progress to `name` on `ref`'s element. Skipped under reduced
- * motion, leaving the CSS fallback (written as `var(--p, <final state>)`).
- * `target` measures a different element (e.g. the enclosing section).
+ * Writes scroll progress to `name` on the element. Under reduced motion it
+ * does nothing, so CSS falls back to the finished state. `target` measures a
+ * different element (e.g. the enclosing section).
  */
 export function useScrollProgress(
   ref: RefObject<HTMLElement | null>,

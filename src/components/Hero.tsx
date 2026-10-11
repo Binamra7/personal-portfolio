@@ -1,5 +1,6 @@
 import { heroIntro, heroLines, profile, stats } from "@/content/site";
 import { CountUp } from "./CountUp";
+import { Glow } from "./Glow";
 import { ArrowDown, ArrowUpRight } from "./icons";
 import { HeroHeadline } from "./scroll/HeroHeadline";
 import { TopBar } from "./TopBar";
@@ -13,14 +14,7 @@ export function Hero() {
     >
       <TopBar />
 
-      {/* Warm glow behind the headline. Static on purpose. */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute top-0 right-0 size-[60rem] translate-x-1/3 -translate-y-1/3 rounded-full opacity-70"
-        style={{
-          background: "radial-gradient(closest-side, rgb(244 167 59 / 0.12), transparent)",
-        }}
-      />
+      <Glow className="top-0 right-0 size-[60rem] translate-x-1/3 -translate-y-1/3" />
 
       <div className="relative mx-auto w-full max-w-7xl px-5 md:px-10">
         <p className="mb-6 flex animate-fade-up items-center gap-3 font-mono text-[13px] text-muted [animation-delay:100ms] md:mb-10">

@@ -50,7 +50,7 @@ function fakeContext() {
 describe("AmbientEngine", () => {
   it("fades the master gain up to a quiet level on start", async () => {
     const { ctx, raw, gains } = fakeContext();
-    const engine = new AmbientEngine(() => ctx);
+    const engine = new AmbientEngine(ctx);
     await engine.start();
 
     expect(engine.playing).toBe(true);
@@ -58,13 +58,13 @@ describe("AmbientEngine", () => {
     const master = gains[0];
     expect(master?.gain.linearRampToValueAtTime).toHaveBeenCalledWith(MASTER_VOLUME, 4);
     expect(MASTER_VOLUME).toBeLessThanOrEqual(0.1);
-    engine.dispose();
+    engine.stop();
   });
 
   it("fades out and suspends on stop", async () => {
     vi.useFakeTimers();
     const { ctx, raw, gains } = fakeContext();
-    const engine = new AmbientEngine(() => ctx);
+    const engine = new AmbientEngine(ctx);
     await engine.start();
     engine.stop();
 

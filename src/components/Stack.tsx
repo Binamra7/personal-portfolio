@@ -19,16 +19,10 @@ export function Stack() {
       <div className="group/stack space-y-6 md:space-y-4">
         {toolkit.map((group, i) => (
           <Reveal key={group.label} delay={i * 70}>
-            <h3 className="mb-1 font-mono text-[13px] text-faint uppercase tracking-widest md:sr-only">
-              {group.label}
-            </h3>
             <div className="md:grid md:grid-cols-[11rem_1fr] md:items-center md:gap-8">
-              <span
-                aria-hidden
-                className="hidden font-mono text-[13px] text-faint tracking-widest md:block"
-              >
+              <h3 className="mb-1 font-mono text-[13px] text-faint uppercase tracking-widest md:mb-0 md:normal-case">
                 {group.label}
-              </span>
+              </h3>
               <DriftRow distance={i % 2 === 0 ? 3 : -3}>
                 <p className="condensed flex flex-wrap gap-x-5 text-[clamp(2.4rem,5.6vw,5.25rem)] uppercase leading-[1.02] md:gap-x-7">
                   {group.items.map((item) => (

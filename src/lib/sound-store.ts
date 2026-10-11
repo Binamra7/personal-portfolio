@@ -1,17 +1,13 @@
 import type { AmbientEngine } from "./ambient";
 
 /**
- * Shared state for the ambient soundtrack, used by every sound toggle.
+ * Shared sound state for every toggle.
  *
- * Sound is ON by default, but browsers only allow audio after a user gesture
- * (click, tap or key press; scrolling doesn't count). So the default state is
- * "armed": the soundtrack starts on the visitor's first interaction. A mute
- * is remembered in localStorage.
- *
- * Performance: the synth code (`./ambient`) is a separate chunk, prefetched
- * when the browser is idle after load and never on the critical path. The
- * AudioContext itself is created synchronously inside the gesture so every
- * browser treats it as user-initiated.
+ * Sound is on by default, but browsers only allow audio after a click, tap or
+ * key press (not scrolling), so the default state is "armed" until then. A
+ * mute is saved in localStorage. The synth (`./ambient`) is a separate chunk,
+ * prefetched when the browser is idle; the AudioContext is created inside the
+ * gesture so browsers accept it as user-initiated.
  */
 export type SoundState = "off" | "armed" | "playing";
 
@@ -24,6 +20,9 @@ let initialised = false;
 const listeners = new Set<() => void>();
 
 const loadEngine = () => import("./ambient");
+
+// A function, so TypeScript re-reads `state` after an await instead of narrowing it.
+const isOff = () => state === "off";
 
 function setState(next: SoundState) {
   state = next;
@@ -46,16 +45,19 @@ function readPreference(): boolean {
   }
 }
 
-/** Creates (or reuses) the engine with a context made inside the current gesture. */
+/** Must be called inside a user gesture: the AudioContext is created synchronously. */
 async function play() {
   if (!engine) {
-    const ctx = new AudioContext(); // synchronous: still inside the gesture
+    const ctx = new AudioContext();
     void ctx.resume();
     const { AmbientEngine } = await loadEngine();
-    engine = new AmbientEngine(() => ctx);
+    engine = new AmbientEngine(ctx);
   }
+  // The visitor may mute while the chunk loads or the context resumes.
+  if (isOff()) return;
   await engine.start();
-  if (state !== "off") setState("playing");
+  if (isOff()) engine.stop();
+  else setState("playing");
 }
 
 function stop() {
