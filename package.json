@@ -20,7 +20,8 @@
     "test:e2e": "playwright test",
     "check": "biome check . && tsc --noEmit && vitest run",
     "images": "node scripts/optimize-images.mjs",
-    "og": "node scripts/render-og.mjs"
+    "og": "node scripts/render-og.mjs",
+    "check:links": "node scripts/check-links.mjs"
   },
   "dependencies": {
     "lenis": "^1.3.26",

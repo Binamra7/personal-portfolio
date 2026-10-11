@@ -138,7 +138,8 @@ export const archiveProjects: Project[] = [
     summary: "Log bugs, sort them by severity, and track them to resolved.",
     stack: ["React", "Node", "MongoDB"],
     sourceUrl: "https://github.com/binamra7/bugReporter",
-    liveUrl: "https://bug-reporter-virid.vercel.app/",
+    // Demo frontend (bug-reporter-virid.vercel.app) is up, but its Heroku API is gone.
+    // Restore `liveUrl` once the API is redeployed.
     image: {
       src: "/projects/bug-reporter.webp",
       alt: "Bug Reporter dashboard listing active bugs by severity",
@@ -150,7 +151,8 @@ export const archiveProjects: Project[] = [
     summary: "Pick your top five films and see what the community ranks highest.",
     stack: ["React", "Redux", "Express"],
     sourceUrl: "https://github.com/binamra7/Filmstop",
-    liveUrl: "https://filmstop.vercel.app/",
+    // Demo frontend (filmstop.vercel.app) is up, but its Heroku API is gone.
+    // Restore `liveUrl` once the API is redeployed.
     image: {
       src: "/projects/filmstop.webp",
       alt: "FilmStop page showing the audience's highest rated movie",

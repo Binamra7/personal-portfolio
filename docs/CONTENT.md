@@ -31,7 +31,7 @@ Everything is in **`src/content/site.ts`**. Facts should match the résumé in
      summary: "One short sentence, under 90 characters.",
      stack: ["Next.js", "Postgres"],
      sourceUrl: "https://github.com/binamra7/my-app", // omit if private
-     liveUrl: "https://my-app.vercel.app",            // optional
+     liveUrl: "https://my-app.vercel.app",            // only if the demo works end to end
      image: { src: "/projects/my-app.webp", alt: "What the screenshot shows" },
    }
    ```
@@ -39,7 +39,11 @@ Everything is in **`src/content/site.ts`**. Facts should match the résumé in
    `archiveProjects` (list row with hover preview, image required).
    A featured project without a screenshot needs a `visual`. Add new visuals
    next to `RagTerminal` and wire them up in `components/Work.tsx`.
-4. `npm run check`
+4. `npm run check`, then `npm run build && npm run check:links`
+
+A demo that opens but whose backend is gone is a broken link. Leave `liveUrl`
+out and the row links to the source instead. FilmStop and Bug Reporter are
+like this today: their Heroku APIs were shut down.
 
 ## Résumé
 

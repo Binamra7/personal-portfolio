@@ -12,7 +12,8 @@
       "Bash(npm run test:*)",
       "Bash(npm run images:*)",
       "Bash(npm run og)",
-      "Bash(npx biome check:*)"
+      "Bash(npx biome check:*)",
+      "Bash(npm run check:links)"
     ],
     "deny": ["Bash(git push origin main:*)", "Bash(git push --force:*)"]
   }

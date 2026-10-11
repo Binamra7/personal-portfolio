@@ -34,6 +34,7 @@ lint/format. Hosted on Vercel at https://binamrakhadka.vercel.app.
 | Auto-fix lint/format         | `npm run lint:fix`                   |
 | Unit tests / watch           | `npm test` / `npm run test:watch`    |
 | E2E + a11y (needs a build)   | `npm run build && npm run test:e2e`  |
+| Check every link (needs build) | `npm run check:links`              |
 | Add a screenshot             | `npm run images -- <file> <slug>`    |
 | Regenerate social image      | `npm run build && npm run og`        |
 

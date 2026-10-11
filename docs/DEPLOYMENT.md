@@ -32,6 +32,10 @@ URL (currently `binamrakhadka.vercel.app`) is used.
 2. **e2e**: build, then Playwright + axe on desktop and mobile. On failure the
    HTML report is uploaded as an artifact.
 
+`.github/workflows/links.yml` checks every external link each Monday (and on
+demand). It runs on a schedule, not on PRs, so a third-party outage never
+blocks a merge. Internal anchors and files are checked in the e2e job.
+
 Deployment is left to Vercel (no deploy job, no tokens in GitHub). Suggested:
 protect `main` in GitHub settings and require the CI checks to pass before merging.
 

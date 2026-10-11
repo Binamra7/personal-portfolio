@@ -6,6 +6,7 @@
 | Components/libs | Vitest + Testing Library       | `src/**/*.test.ts(x)`       |
 | End-to-end      | Playwright (desktop + Pixel 7) | `tests/e2e/*.spec.ts`       |
 | Accessibility   | axe-core via Playwright        | `tests/e2e/home.spec.ts`    |
+| Links           | `scripts/check-links.mjs`      | internal in CI, external weekly |
 | Lint / format   | Biome                          | `biome.json`                |
 | Types           | TypeScript 7 (`tsc`)           | `tsconfig.json`             |
 
