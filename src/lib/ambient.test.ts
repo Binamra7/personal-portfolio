@@ -57,7 +57,7 @@ describe("AmbientEngine", () => {
     expect(raw.resume).toHaveBeenCalled();
     const master = gains[0];
     expect(master?.gain.linearRampToValueAtTime).toHaveBeenCalledWith(MASTER_VOLUME, 4);
-    expect(MASTER_VOLUME).toBeLessThanOrEqual(0.1);
+    expect(MASTER_VOLUME).toBeLessThanOrEqual(0.2); // loudness itself is measured in e2e
     engine.stop();
   });
 
@@ -75,7 +75,7 @@ describe("AmbientEngine", () => {
     vi.useRealTimers();
   });
 
-  it("only uses pentatonic chime notes", () => {
-    expect(CHIME_NOTES.every((f) => f >= 200 && f <= 700)).toBe(true);
+  it("keeps chimes in the range small speakers reproduce", () => {
+    expect(CHIME_NOTES.every((f) => f >= 400 && f <= 1500)).toBe(true);
   });
 });

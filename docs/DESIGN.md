@@ -97,9 +97,17 @@ Better screenshots can be dropped in later without any layout change.
 
 ## Sound
 
-`lib/ambient.ts` synthesises the music live with Web Audio: a detuned
-A/E drone through a slowly breathing low-pass filter, plus random A-minor
-pentatonic chimes every 3–8s through a generated reverb. Master volume is
-0.07. It's on by default: it starts on the visitor's first click, tap or key
-press (browsers block autoplay), and a mute is remembered. It fades in and out, and pauses while the tab is hidden. Toggles
-in the top bar and dock share state through `lib/sound-store.ts`.
+`lib/ambient.ts` synthesises the music live with Web Audio: a detuned A3/E4/A4
+triangle drone under a slowly breathing low-pass filter, plus random C5–E6
+pentatonic chimes every 3–8s through a generated reverb.
+
+- **Keep it above ~200 Hz.** Laptop and phone speakers can't reproduce bass.
+  The first version used a 110 Hz drone and was silent on them even though it
+  was "playing".
+- **Loudness target:** about −26 dBFS RMS in the audible band. The e2e test
+  `the soundtrack is audible on small speakers, but quiet` measures it and
+  fails outside −34 to −18 dB. Re-run it after any change to the mix.
+- **States:** "Tap for sound" (armed: on by default, but browsers block audio
+  until the first click, tap or key), "Sound on" (playing), "Sound off" (muted,
+  remembered). Clicking an armed toggle starts playback. Toggles in the top bar
+  and dock share state through `lib/sound-store.ts`.

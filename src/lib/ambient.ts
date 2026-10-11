@@ -3,15 +3,24 @@
  * drone under a slowly breathing low-pass filter, plus sparse pentatonic
  * chimes through a synthetic reverb. No audio files.
  *
+ * Everything sits between ~220 Hz and 1.3 kHz on purpose: laptop and phone
+ * speakers barely reproduce anything below ~200 Hz, so a bass drone is silent
+ * on them. An e2e test measures the audible output level.
+ *
  * Loaded lazily by `sound-store.ts`, which owns the AudioContext.
  */
 
-export const MASTER_VOLUME = 0.07;
+export const MASTER_VOLUME = 0.14;
 
-/** A minor pentatonic across two octaves, so any two notes sound consonant. */
-export const CHIME_NOTES = [220, 261.63, 293.66, 329.63, 392, 440, 523.25, 587.33, 659.25];
+/** A minor pentatonic (C5–E6), so any two notes sound consonant. */
+export const CHIME_NOTES = [523.25, 587.33, 659.25, 783.99, 880, 1046.5, 1174.66, 1318.51];
 
-const DRONE_NOTES = [110, 164.81, 220];
+/** A3, E4, A4 with relative levels. */
+const DRONE = [
+  { freq: 220, gain: 0.3 },
+  { freq: 329.63, gain: 0.14 },
+  { freq: 440, gain: 0.07 },
+];
 
 export class AmbientEngine {
   private master: GainNode | null = null;
@@ -65,27 +74,27 @@ export class AmbientEngine {
 
     const filter = ctx.createBiquadFilter();
     filter.type = "lowpass";
-    filter.frequency.value = 500;
-    filter.Q.value = 0.7;
+    filter.frequency.value = 1100;
+    filter.Q.value = 0.5;
     filter.connect(master);
     filter.connect(reverb);
 
     const lfo = ctx.createOscillator();
     lfo.frequency.value = 0.04;
     const lfoDepth = ctx.createGain();
-    lfoDepth.gain.value = 250;
+    lfoDepth.gain.value = 400;
     lfo.connect(lfoDepth).connect(filter.frequency);
     lfo.start();
 
     // Each drone note is a slightly detuned pair, which gives a slow beating shimmer.
-    for (const [i, freq] of DRONE_NOTES.entries()) {
+    for (const note of DRONE) {
       for (const detune of [-5, 5]) {
         const osc = ctx.createOscillator();
-        osc.type = i === 0 ? "sine" : "triangle";
-        osc.frequency.value = freq;
+        osc.type = "triangle";
+        osc.frequency.value = note.freq;
         osc.detune.value = detune;
         const gain = ctx.createGain();
-        gain.gain.value = i === 0 ? 0.35 : 0.12;
+        gain.gain.value = note.gain;
         osc.connect(gain).connect(filter);
         osc.start();
       }
@@ -109,11 +118,11 @@ export class AmbientEngine {
     const now = ctx.currentTime;
     const env = ctx.createGain();
     env.gain.setValueAtTime(0, now);
-    env.gain.linearRampToValueAtTime(0.18, now + 0.02);
+    env.gain.linearRampToValueAtTime(0.3, now + 0.02);
     env.gain.exponentialRampToValueAtTime(0.0001, now + 4);
     env.connect(reverb);
     const dry = ctx.createGain();
-    dry.gain.value = 0.25;
+    dry.gain.value = 0.4;
     env.connect(dry).connect(master);
 
     // Fundamental plus a quiet inharmonic overtone: a soft bell.

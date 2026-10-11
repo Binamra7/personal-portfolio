@@ -116,18 +116,18 @@ export const soundStore = {
     idle(() => void loadEngine());
   },
 
-  /** Must run from a click handler. */
+  /** Must run from a click handler. Armed or off → play; playing → mute. */
   toggle() {
     if (typeof AudioContext === "undefined") return;
     removeGestureListeners();
-    if (state === "off") {
-      savePreference(true);
-      setState("armed");
-      void play();
-    } else {
+    if (state === "playing") {
       savePreference(false);
       setState("off");
       stop();
+    } else {
+      savePreference(true);
+      setState("armed");
+      void play();
     }
   },
 };

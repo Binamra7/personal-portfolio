@@ -1,6 +1,7 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 import { archiveProjects, featuredProjects, profile } from "../../src/content/site";
+import { audibleLevel, tapAudio } from "./audio-tap";
 
 test.describe("home page", () => {
   test("loads without console errors and shows the hero", async ({ page }) => {
@@ -86,11 +87,13 @@ test.describe("navigation", () => {
     await page.goto("/");
     const toggles = page.locator("[data-sound-toggle]");
     await expect(toggles).toHaveCount(2);
+    // Browsers block audio until a gesture, so the UI must not claim it's playing yet.
     await expect(toggles.first()).toHaveAttribute("data-state", "armed");
+    await expect(toggles.first()).toContainText("Tap for sound");
 
-    // Browsers only allow audio after a gesture: the first click starts it.
     await page.locator("h1").click();
     await expect(toggles.first()).toHaveAttribute("data-state", "playing");
+    await expect(toggles.first()).toContainText("Sound on");
 
     await page
       .getByRole("button", { name: /mute ambient sound/i })
@@ -101,6 +104,25 @@ test.describe("navigation", () => {
 
     await page.reload();
     await expect(page.locator("[data-sound-toggle]").first()).toHaveAttribute("data-state", "off");
+  });
+
+  test("clicking the toggle before any other interaction starts the sound", async ({ page }) => {
+    await page.goto("/");
+    const toggle = page.locator("[data-sound-toggle]").first();
+    await toggle.click();
+    await expect(toggle).toHaveAttribute("data-state", "playing");
+  });
+
+  test("the soundtrack is audible on small speakers, but quiet", async ({ page, isMobile }) => {
+    test.skip(isMobile, "same audio on every device; measure once");
+    await tapAudio(page);
+    await page.goto("/");
+    await page.locator("h1").click();
+    await page.waitForTimeout(4500); // fade-in
+    const level = await audibleLevel(page);
+    // Regression: a bass-only mix measured about -60 dB here, which is silence on laptops.
+    expect(level).toBeGreaterThan(-34);
+    expect(level).toBeLessThan(-18);
   });
 });
 
